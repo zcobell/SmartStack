@@ -9,7 +9,7 @@ unix {
 }
 
 SOURCES += \
-  main.cpp
+  cxx_testSmartStack.cpp
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libsmartstack/release/ -llibsmartstack
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libsmartstack/debug/ -llibsmartstack
