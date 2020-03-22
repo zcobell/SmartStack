@@ -23,10 +23,16 @@ void endSession() { SmartStack::Stack::endSession(); }
 
 void printStack() { SmartStack::Stack::printCurrentStack(); }
 
-void printTimingReport() { SmartStack::Stack::printTimingReport(); }
+void printTimingReport(
+    SmartStack::Stack::SortType sortType = SmartStack::Stack::SortType::Time,
+    SmartStack::Stack::SortOrder sortOrder =
+        SmartStack::Stack::SortOrder::Ascending) {
+  SmartStack::Stack::printTimingReport(sortType, sortOrder);
+}
 
-Instrumentation addInstrumentation(const std::string &functionName) {
-  return SmartStack::Instrumentation(functionName);
+Instrumentation addInstrumentation(const std::string &functionName,
+                                   bool showStack = false) {
+  return SmartStack::Instrumentation(functionName, showStack);
 }
 
 }  // namespace SmartStack

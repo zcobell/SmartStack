@@ -3,6 +3,12 @@
         MODULE SMARTSTACKMODULE
             USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_PTR
             IMPLICIT NONE
+            
+            INTEGER,PARAMETER :: SMARTSTACK_SORTASCENDING = 10000
+            INTEGER,PARAMETER :: SMARTSTACK_SORTDECENDING = 10001
+            INTEGER,PARAMETER :: SMARTSTACK_SORTTIME      = 20000
+            INTEGER,PARAMETER :: SMARTSTACK_SORTMEANTIME  = 20001
+            INTEGER,PARAMETER :: SMARTSTACK_SORTCALLS     = 20002
 
             TYPE SMARTSTACK
                 PRIVATE
@@ -42,10 +48,12 @@
                     IMPLICIT NONE
                 END SUBROUTINE c_printStack
 
-                SUBROUTINE c_printTimingReport() BIND(C,NAME="printTimingReportFtn")
+                SUBROUTINE c_printTimingReport(SORT_TYPE,SORT_ORDER) BIND(C,NAME="printTimingReportFtn")
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT
                     IMPLICIT NONE
+                    INTEGER(C_INT),VALUE :: SORT_TYPE
+                    INTEGER(C_INT),VALUE :: SORT_ORDER
                 END SUBROUTINE c_printTimingReport
-
             END INTERFACE
 
             CONTAINS
@@ -80,9 +88,23 @@
                     CALL c_printStack()
                 END SUBROUTINE SmartStack_printCurrentStackTrace
 
-                SUBROUTINE SmartStack_printTimingReport()
+                SUBROUTINE SmartStack_printTimingReport(SORT_TYPE,SORT_ORDER)
                     IMPLICIT NONE
-                    CALL c_printTimingReport()
+                    INTEGER,OPTIONAL,INTENT(IN) :: SORT_TYPE
+                    INTEGER,OPTIONAL,INTENT(IN) :: SORT_ORDER
+                    INTEGER                     :: F_SORT_TYPE
+                    INTEGER                     :: F_SORT_ORDER
+                    IF(PRESENT(SORT_TYPE))THEN
+                        F_SORT_TYPE = SORT_TYPE
+                    ELSE
+                        F_SORT_TYPE = SMARTSTACK_SORTTIME
+                    ENDIF
+                    IF(PRESENT(SORT_ORDER))THEN
+                        F_SORT_ORDER = SORT_ORDER
+                    ELSE
+                        F_SORT_ORDER = SMARTSTACK_SORTDECENDING
+                    ENDIF
+                    CALL c_printTimingReport(F_SORT_TYPE,F_SORT_ORDER)
                 END SUBROUTINE SmartStack_printTimingReport
 
 

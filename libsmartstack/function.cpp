@@ -7,6 +7,14 @@ void Function::startFunction() {
   this->m_ncall++;
 }
 
+void Function::pauseFunction() { this->m_timer.stopClock(); }
+
+void Function::restartFunction() { this->m_timer.startClock(); }
+
+long long Function::meanDuration() {
+  return this->m_timer.elapsed() / this->m_ncall;
+}
+
 void Function::endFunction() { this->m_timer.stopClock(); }
 
 std::string Function::name() const { return m_name; }

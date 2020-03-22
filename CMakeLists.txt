@@ -106,14 +106,16 @@ set(SMARTSTACK_VERSION_PATCH 0)
 set(SMARTSTACK_VERSION_STRING ${SMARTSTACK_VERSION_MAJOR}.${SMARTSTACK_VERSION_MINOR}.${SMARTSTACK_VERSION_PATCH})
 ###########################################################################
 
+OPTION( SMARTSTACK_AGGREGATE "Includes functions deeper in the stack in total time" OFF )
+
 ###########################################################################
 # CODE VERSION (GIT)
 ###########################################################################
 EXECUTE_PROCESS( COMMAND git describe --always --tags
-                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                    OUTPUT_VARIABLE GIT_VERSION
-                    RESULT_VARIABLE GIT_RETURN_VALUE
-                    OUTPUT_STRIP_TRAILING_WHITESPACE )
+                 WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                 OUTPUT_VARIABLE GIT_VERSION
+                 RESULT_VARIABLE GIT_RETURN_VALUE
+                 OUTPUT_STRIP_TRAILING_WHITESPACE )
 IF( NOT "${GIT_RETURN_VALUE}" STREQUAL "0" )
     SET(GIT_VERSION "${SMARTSTACK_VERSION_STRING}.cv")
 ENDIF()
@@ -142,6 +144,10 @@ SET( SMARTSTACK_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/timer.cpp
                         ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/smartstack.F90 )
 
 ADD_LIBRARY( smartstack SHARED ${SMARTSTACK_SOURCES} )
+
+IF( SMARTSTACK_AGGREGATE )
+    TARGET_COMPILE_DEFINITIONS( smartstack PRIVATE "SMARTSTACK_AGGREGATE" )
+ENDIF( SMARTSTACK_AGGREGATE )
 
 SET_TARGET_PROPERTIES( smartstack PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles/smartstack )
 

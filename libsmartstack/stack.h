@@ -13,15 +13,16 @@ namespace SmartStack {
 class Stack {
  public:
   enum SortOrder { Ascending, Decending };
-  enum SortType { Time, Calls };
+  enum SortType { Time, MeanTime, Calls };
 
   static void startSession(const std::string session);
   static void endSession();
-  static void startFunction(const std::string &functionName);
-  static void endFunction();
+  static void startFunction(const std::string &functionName,
+                            bool showStack = false);
+  static void endFunction(bool showStack = false);
   static void printCurrentStack();
-  static void printTimingReport(Stack::SortType st = Time,
-                                Stack::SortOrder so = Decending);
+  static void printTimingReport(const Stack::SortType &st = Time,
+                                const Stack::SortOrder &so = Decending);
   static bool sessionStarted();
 
  private:
@@ -38,9 +39,12 @@ class Stack {
   void m_endSession();
   void m_endFunction();
   void m_startFunction(const std::string &functionName);
-  void m_printCurrentStack();
-  void m_printTimingReport(SortType st, SortOrder so);
-  void sortFunctions(SortType st, SortOrder so);
+  void m_printCurrentStack(const std::string &message = std::string());
+  void m_printTimingReport(const SortType &st, const SortOrder &so);
+  void sortFunctions(const SortType &st, const SortOrder &so);
+  void getSortCodes(std::string &calls, std::string &duration,
+                    std::string &meanDuration, const Stack::SortType &st,
+                    const Stack::SortOrder &so);
 
   void writeHeader();
   void writeFooter();

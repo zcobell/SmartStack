@@ -12,6 +12,11 @@ class Function {
   void startFunction();
   void endFunction();
 
+  void pauseFunction();
+  void restartFunction();
+
+  long long meanDuration();
+
   Timer *timer();
 
   std::string name() const;

@@ -8,10 +8,14 @@
 namespace SmartStack {
 class Instrumentation {
  public:
-  Instrumentation(const std::string &functionName) {
-    SmartStack::Stack::startFunction(functionName);
+  Instrumentation(const std::string &functionName, bool showStack = false)
+      : m_showStack(showStack) {
+    SmartStack::Stack::startFunction(functionName, this->m_showStack);
   }
-  ~Instrumentation() { SmartStack::Stack::endFunction(); }
+  ~Instrumentation() { SmartStack::Stack::endFunction(this->m_showStack); }
+
+ private:
+  bool m_showStack;
 };
 }  // namespace SmartStack
 
