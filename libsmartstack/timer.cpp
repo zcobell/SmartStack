@@ -1,6 +1,6 @@
 #include "timer.h"
 
-Timer::Timer() : m_totalElapsed(0), m_running(false) {}
+Timer::Timer() : m_totalElapsed(0), m_lastElapsed(0), m_running(false) {}
 
 void Timer::startClock() {
   this->m_running = true;

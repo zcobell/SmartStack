@@ -15,7 +15,7 @@ class Stack {
   enum SortOrder { Ascending, Decending };
   enum SortType { Time, MeanTime, Calls };
 
-  static void startSession(const std::string session);
+  static void startSession(const std::string &session);
   static void endSession();
   static void startFunction(const std::string &functionName,
                             bool showStack = false);

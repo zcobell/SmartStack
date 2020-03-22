@@ -43,7 +43,7 @@ Stack::Stack() : m_started(false), m_firstProfile(true) {
 
 Stack::~Stack() { this->m_endSession(); }
 
-void Stack::startSession(const std::string session) {
+void Stack::startSession(const std::string &session) {
   Stack::get().m_startSession(session);
 }
 
