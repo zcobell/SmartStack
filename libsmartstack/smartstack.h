@@ -6,9 +6,6 @@
 #include "instrumentation.h"
 
 #define ADD_SMARTSTACK(fname)                          \
-  if (!SmartStack::sessionStarted()) {                 \
-    SmartStack::startSession("NoSessionNameGiven");    \
-  }                                                    \
   SmartStack::Instrumentation __SmartStackInstrument = \
       SmartStack::addInstrumentation(fname);
 

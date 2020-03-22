@@ -1,17 +1,34 @@
 
 
+#include <iostream>
 #include <memory>
 
 #include "smartstack.h"
-#include <iostream>
 
 extern "C" {
-void* addSmartStack(const char* functionName);
+void startSessionFtn(char* sessionName);
+void* addSmartStackFtn(char* functionName);
+void deleteSmartStackFtn(void* ptr);
+void printFunctionStackFtn();
+void printTimingReportFtn();
 }
 
-void* addSmartStack(const char* functionName) {
-  std::cout << functionName << std::endl;
+void startSessionFtn(char* sessionName) {
+  SmartStack::startSession(sessionName);
+}
+
+void* addSmartStackFtn(char* functionName) {
   SmartStack::Instrumentation* s =
       new SmartStack::Instrumentation(functionName);
   return (void*)s;
 }
+
+void deleteSmartStackFtn(void* ptr) {
+  SmartStack::Instrumentation* s =
+      reinterpret_cast<SmartStack::Instrumentation*>(ptr);
+  delete s;
+}
+
+void printFunctionStackFtn() { SmartStack::printStack(); }
+
+void printTimingReportFtn() { SmartStack::printTimingReport(); }

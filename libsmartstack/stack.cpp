@@ -1,5 +1,6 @@
 #include "stack.h"
 
+#include <algorithm>
 #include <iostream>
 
 using namespace SmartStack;
@@ -35,6 +36,9 @@ void Stack::startSession(const std::string session) {
 void Stack::endSession() { Stack::get().m_endSession(); }
 
 void Stack::startFunction(const std::string &functionName) {
+  if (!Stack::get().m_sessionStarted()) {
+    Stack::get().startSession("NoSessionGiven");
+  }
   Stack::get().m_startFunction(functionName);
 }
 

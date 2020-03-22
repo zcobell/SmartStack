@@ -9,8 +9,17 @@
                 IMPLICIT NONE
                 TYPE(SMARTSTACK) :: ss
                 ss = SmartStack("Smart1")
-                WRITE(*,*) ss%ptr
+                CALL SmartStack_printCurrentStackTrace()
+                CALL SMART2()
+                CALL SMART2()
             END SUBROUTINE Smart1
+            
+            SUBROUTINE Smart2
+                IMPLICIT NONE
+                TYPE(SMARTSTACK) :: ss
+                ss = SmartStack("Smart2")
+                CALL SmartStack_printCurrentStackTrace()
+            END SUBROUTINE Smart2
 
         END MODULE sample
 
@@ -18,9 +27,15 @@
         PROGRAM smartstack_test
             USE sample
             IMPLICIT NONE
+            TYPE(SMARTSTACK) :: ss
 
-            WRITE(*,*) "About to call"
+            CALL SmartStack_StartSession("TestSession")
+            ss = SmartStack("main")
+
             CALL SMART1()
-            WRITE(*,*) "Returned from call"
+            CALL SMART1()
+            CALL SMART2()
+
+            CALL SmartStack_printTimingReport()
 
         END PROGRAM smartstack_test
