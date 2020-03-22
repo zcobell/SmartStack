@@ -7,6 +7,7 @@
 
 extern "C" {
 void startSessionFtn(char* sessionName);
+void endSessionFtn();
 void* addSmartStackFtn(char* functionName);
 void deleteSmartStackFtn(void* ptr);
 void printFunctionStackFtn();
@@ -15,6 +16,10 @@ void printTimingReportFtn();
 
 void startSessionFtn(char* sessionName) {
   SmartStack::startSession(sessionName);
+}
+
+void endSessionFtn() {
+  SmartStack::endSession();
 }
 
 void* addSmartStackFtn(char* functionName) {

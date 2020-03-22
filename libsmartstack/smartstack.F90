@@ -34,6 +34,10 @@
                     CHARACTER(KIND=C_CHAR),INTENT(IN) :: session_name
                 END SUBROUTINE c_startSession
 
+                SUBROUTINE c_endSession() BIND(C,NAME="endSessionFtn")
+                    IMPLICIT NONE
+                END SUBROUTINE c_endSession
+
                 SUBROUTINE c_printStack() BIND(C,NAME="printFunctionStackFtn")
                     IMPLICIT NONE
                 END SUBROUTINE c_printStack
@@ -66,6 +70,10 @@
                     CHARACTER(*)     :: session_name
                     CALL c_startSession(session_name//C_NULL_CHAR)
                 END SUBROUTINE SmartStack_startSession
+
+                SUBROUTINE SmartStack_endSession()
+                    CALL c_endSession()
+                END SUBROUTINE SmartStack_endSession
 
                 SUBROUTINE SmartStack_printCurrentStackTrace()
                     IMPLICIT NONE

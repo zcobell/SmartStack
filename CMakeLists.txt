@@ -135,17 +135,19 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles)
 ###########################################################################
 #  SmartStack Library
 ###########################################################################
-SET( SMARTSTACK_SOURCES ${CMAKE_SOURCE_DIR}/libsmartstack/timer.cpp
-                        ${CMAKE_SOURCE_DIR}/libsmartstack/function.cpp
-                        ${CMAKE_SOURCE_DIR}/libsmartstack/stack.cpp 
-                        ${CMAKE_SOURCE_DIR}/libsmartstack/smartstackftn.cpp
-                        ${CMAKE_SOURCE_DIR}/libsmartstack/smartstack.F90 )
+SET( SMARTSTACK_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/timer.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/function.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/stack.cpp 
+                        ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/smartstackftn.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/smartstack.F90 )
 
 ADD_LIBRARY( smartstack SHARED ${SMARTSTACK_SOURCES} )
 
+SET_TARGET_PROPERTIES( smartstack PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles/smartstack )
+
 SET(HEADER_LIST ${CMAKE_SOURCE_DIR}/libsmartstack/smartstack.h )
 
-TARGET_INCLUDE_DIRECTORIES( smartstack PRIVATE ${CMAKE_SOURCE_DIR}/libsmartstack )
+TARGET_INCLUDE_DIRECTORIES( smartstack PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack )
 
 TARGET_COMPILE_DEFINITIONS( smartstack PRIVATE GIT_VERSION="${GIT_VERSION}")
 TARGET_COMPILE_DEFINITIONS( smartstack PRIVATE SMARTSTACK_LIBRARY )
@@ -180,6 +182,6 @@ ENDIF(APPLE)
 ###########################################################################
 
 
-ADD_EXECUTABLE(ftn_test ${CMAKE_SOURCE_DIR}/test/fortranTest.F90 )
+ADD_EXECUTABLE(ftn_test ${CMAKE_CURRENT_SOURCE_DIR}/test/fortranTest.F90 )
 ADD_DEPENDENCIES( ftn_test smartstack )
 TARGET_LINK_LIBRARIES( ftn_test smartstack )
