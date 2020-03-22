@@ -44,7 +44,7 @@ void printStack() { SmartStack::Stack::printCurrentStack(); }
 void printTimingReport(
     SmartStack::Stack::SortType sortType = SmartStack::Stack::SortType::Time,
     SmartStack::Stack::SortOrder sortOrder =
-        SmartStack::Stack::SortOrder::Ascending) {
+        SmartStack::Stack::SortOrder::Decending) {
   SmartStack::Stack::printTimingReport(sortType, sortOrder);
 }
 
