@@ -44,6 +44,8 @@ static void bench_lookupExistingFunction(benchmark::State& state) {
     SmartStack::Stack::startFunction(fn);
     SmartStack::Stack::endFunction();
   }
+
+  SmartStack::saveTimingReport("report.txt");
 }
 
 static void bench_lookupNewFunction(benchmark::State& state) {

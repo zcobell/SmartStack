@@ -48,6 +48,14 @@ void printTimingReport(
   SmartStack::Stack::printTimingReport(sortType, sortOrder);
 }
 
+void saveTimingReport(
+    const std::string &filename,
+    SmartStack::Stack::SortType sortType = SmartStack::Stack::SortType::Time,
+    SmartStack::Stack::SortOrder sortOrder =
+        SmartStack::Stack::SortOrder::Decending) {
+  SmartStack::Stack::saveTimingReport(filename, sortType, sortOrder);
+}
+
 Instrumentation addInstrumentation(const std::string &functionName,
                                    bool showStack = false) {
   return SmartStack::Instrumentation(functionName, showStack);

@@ -108,6 +108,12 @@ set(SMARTSTACK_VERSION_STRING ${SMARTSTACK_VERSION_MAJOR}.${SMARTSTACK_VERSION_M
 ###########################################################################
 
 OPTION( SMARTSTACK_AGGREGATE "Includes functions deeper in the stack in total time" OFF )
+OPTION( SMARTSTACK_BUILDSHARED "Build shared object version of SmartStack" OFF )
+IF( SMARTSTACK_BUILDSHARED )
+    SET( SMARTSTACK_LIBTYPE SHARED )
+ELSE( SMARTSTACK_BUILDSHARED )
+    SET( SMARTSTACK_LIBTYPE STATIC )
+ENDIF( SMARTSTACK_BUILDSHARED )
 
 ###########################################################################
 # CODE VERSION (GIT)
@@ -148,7 +154,7 @@ SET( SMARTSTACK_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/timer.cpp
                         ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/smartstackftn.cpp
                         ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/smartstack.F90 )
 
-ADD_LIBRARY( smartstack SHARED ${SMARTSTACK_SOURCES} )
+ADD_LIBRARY( smartstack ${SMARTSTACK_LIBTYPE} ${SMARTSTACK_SOURCES} )
 
 IF( SMARTSTACK_AGGREGATE )
     TARGET_COMPILE_DEFINITIONS( smartstack PRIVATE "SMARTSTACK_AGGREGATE" )
