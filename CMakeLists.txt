@@ -60,6 +60,7 @@ IF(COVERAGE)
         INCLUDE(CodeCoverage)
         setup_target_for_coverage(smartstack_coverage tests coverage)
         SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -pthread -g -O0 -fprofile-arcs -ftest-coverage")
+        SET(CMAKE_Fortran_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -pthread -g -O0 -fprofile-arcs -ftest-coverage")
     ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 ENDIF(COVERAGE)
 ###########################################################################

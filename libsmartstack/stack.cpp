@@ -252,9 +252,9 @@ std::vector<std::string> Stack::generateTimingReport(const SortType &st,
     double mts = static_cast<double>(mt) +
                  static_cast<double>(f->meanDuration() - mt) / 1e6;
     char line[200];
-    int len = snprintf(
-        line, 200, "| %8zu | %30s | %11lld |       %6.6e |          %6.6e |",
-        i, f->name().c_str(), f->numCalls(), ts, mts);
+    snprintf(line, 200,
+             "| %8zu | %30s | %11lld |       %6.6e |          %6.6e |", i,
+             f->name().c_str(), f->numCalls(), ts, mts);
     table.push_back(line);
   }
   table.push_back(
