@@ -1,5 +1,5 @@
 
 TEMPLATE = subdirs
 
-SUBDIRS  = libsmartstack tests
+SUBDIRS  = libsmartstack tests bench
 CONFIG += ordered           

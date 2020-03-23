@@ -84,7 +84,6 @@ ELSE(COMPILER_SUPPORTS_CXX14)
 ENDIF(COMPILER_SUPPORTS_CXX14)
 ###########################################################################
 
-
 ###########################################################################
 #  Compiler flags 
 ###########################################################################
@@ -96,6 +95,7 @@ MARK_AS_ADVANCED( CLEAR CMAKE_C_FLAGS_DEBUG )
 MARK_AS_ADVANCED( CLEAR CMAKE_CXX_COMPILER )
 MARK_AS_ADVANCED( CLEAR CMAKE_C_COMPILER )
 ###########################################################################
+
 
 ###########################################################################
 #  LIBRARY VERSION
@@ -123,9 +123,13 @@ MESSAGE(STATUS "SmartStack Version: ${GIT_VERSION}")
 ###########################################################################
 
 ###########################################################################
-# TESTING 
+# TESTING AND BENCHMARKING
 ###########################################################################
-OPTION(BUILD_TESTS "Build test cases" OFF)
+OPTION(SMARTSTACK_BUILD_TESTS "Build test cases" OFF)
+OPTION(SMARTSTACK_BUILD_BENCHMARK "Build benchmark" OFF)
+IF(SMARTSTACK_BUILD_BENCHMARK)
+    SET( GOOGLE_BENCHMARK_HOME "/opt/google/benchmark" CACHE STRING "Location of the Google Benchmark library" )
+ENDIF(SMARTSTACK_BUILD_BENCHMARK)
 ###########################################################################
 
 ###########################################################################
@@ -148,7 +152,7 @@ ADD_LIBRARY( smartstack SHARED ${SMARTSTACK_SOURCES} )
 IF( SMARTSTACK_AGGREGATE )
     TARGET_COMPILE_DEFINITIONS( smartstack PRIVATE "SMARTSTACK_AGGREGATE" )
 ENDIF( SMARTSTACK_AGGREGATE )
-
+    
 SET_TARGET_PROPERTIES( smartstack PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles/smartstack )
 
 SET(HEADER_LIST ${CMAKE_SOURCE_DIR}/libsmartstack/smartstack.h )
@@ -188,7 +192,7 @@ ENDIF(APPLE)
 ###########################################################################
 
 
-IF(BUILD_TESTS)
+IF(SMARTSTACK_BUILD_TESTS)
     SET(TEST_LIST ftn_testSmartStack.F90 cxx_testSmartStack.cpp )
     FOREACH(TESTFILE ${TEST_LIST} ) 
         GET_FILENAME_COMPONENT( TESTNAME ${TESTFILE} NAME_WE )
@@ -206,4 +210,11 @@ IF(BUILD_TESTS)
            SET_TESTS_PROPERTIES( TEST_${TESTNAME} PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=$ENV{LD_LIBRARY_PATH}:${CMAKE_BINARY_DIR}")
         ENDIF(CYGWIN)
     ENDFOREACH()
-ENDIF(BUILD_TESTS)
+ENDIF(SMARTSTACK_BUILD_TESTS)
+
+IF(SMARTSTACK_BUILD_BENCHMARK)
+    ADD_EXECUTABLE( smartstack_benchmark ${CMAKE_SOURCE_DIR}/bench/main.cpp )
+    TARGET_LINK_LIBRARIES( smartstack_benchmark smartstack benchmark pthread )
+    TARGET_LINK_DIRECTORIES( smartstack_benchmark PRIVATE ${GOOGLE_BENCHMARK_HOME}/lib )
+    TARGET_INCLUDE_DIRECTORIES( smartstack_benchmark PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack ${GOOGLE_BENCHMARK_HOME}/include )
+ENDIF(SMARTSTACK_BUILD_BENCHMARK)
