@@ -21,27 +21,28 @@
 
 #include <string>
 
+#include "smartstack_global.h"
 #include "timer.h"
 
 class Function {
  public:
-  Function(const std::string &name);
+  SMARTSTACK_EXPORT Function(const std::string &name);
 
-  void startFunction();
-  void endFunction();
+  void SMARTSTACK_EXPORT startFunction();
+  void SMARTSTACK_EXPORT endFunction();
 
-  void pauseFunction();
-  void restartFunction();
+  void SMARTSTACK_EXPORT pauseFunction();
+  void SMARTSTACK_EXPORT restartFunction();
 
-  long long meanDuration();
+  long long SMARTSTACK_EXPORT meanDuration();
 
-  Timer *timer();
+  Timer SMARTSTACK_EXPORT *timer();
 
-  std::string name() const;
+  std::string SMARTSTACK_EXPORT name() const;
 
-  long long numCalls() const;
+  long long SMARTSTACK_EXPORT numCalls() const;
 
-  bool running() const;
+  bool SMARTSTACK_EXPORT running() const;
 
  private:
   const std::string m_name;

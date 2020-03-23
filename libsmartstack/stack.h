@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "function.h"
+#include "smartstack_global.h"
 
 namespace SmartStack {
 
@@ -33,18 +34,18 @@ class Stack {
   enum SortOrder { Ascending, Decending };
   enum SortType { Time, MeanTime, Calls };
 
-  static void startSession(const std::string &session);
-  static void endSession();
-  static void startFunction(const std::string &functionName,
-                            bool showStack = false);
-  static void endFunction(bool showStack = false);
-  static void printCurrentStack();
-  static void printTimingReport(const Stack::SortType &st = Time,
-                                const Stack::SortOrder &so = Decending);
-  static void saveTimingReport(const std::string &filename,
-                               const Stack::SortType &st = Time,
-                               const Stack::SortOrder &so = Decending);
-  static bool sessionStarted();
+  static void SMARTSTACK_EXPORT startSession(const std::string &session);
+  static void SMARTSTACK_EXPORT endSession();
+  static void SMARTSTACK_EXPORT startFunction(const std::string &functionName,
+                                              bool showStack = false);
+  static void SMARTSTACK_EXPORT endFunction(bool showStack = false);
+  static void SMARTSTACK_EXPORT printCurrentStack();
+  static void SMARTSTACK_EXPORT printTimingReport(
+      const Stack::SortType &st = Time, const Stack::SortOrder &so = Decending);
+  static void SMARTSTACK_EXPORT saveTimingReport(
+      const std::string &filename, const Stack::SortType &st = Time,
+      const Stack::SortOrder &so = Decending);
+  static bool SMARTSTACK_EXPORT sessionStarted();
 
  private:
   bool m_started;

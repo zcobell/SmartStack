@@ -21,16 +21,20 @@
 
 #include <string>
 
+#include "smartstack_global.h"
 #include "stack.h"
 
 namespace SmartStack {
 class Instrumentation {
  public:
-  Instrumentation(const std::string &functionName, bool showStack = false)
+  SMARTSTACK_EXPORT Instrumentation(const std::string &functionName,
+                                    bool showStack = false)
       : m_showStack(showStack) {
     SmartStack::Stack::startFunction(functionName, this->m_showStack);
   }
-  ~Instrumentation() { SmartStack::Stack::endFunction(this->m_showStack); }
+  SMARTSTACK_EXPORT ~Instrumentation() {
+    SmartStack::Stack::endFunction(this->m_showStack);
+  }
 
  private:
   bool m_showStack;

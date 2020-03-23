@@ -22,6 +22,7 @@
 #include <string>
 
 #include "instrumentation.h"
+#include "smartstack_global.h"
 
 #define ADD_SMARTSTACK(fname)                          \
   SmartStack::Instrumentation __SmartStackInstrument = \
@@ -31,24 +32,26 @@
 
 namespace SmartStack {
 
-bool sessionStarted() { return SmartStack::Stack::sessionStarted(); }
+bool SMARTSTACK_EXPORT sessionStarted() {
+  return SmartStack::Stack::sessionStarted();
+}
 
-void startSession(const std::string &sessionName) {
+void SMARTSTACK_EXPORT startSession(const std::string &sessionName) {
   SmartStack::Stack::startSession(sessionName);
 }
 
-void endSession() { SmartStack::Stack::endSession(); }
+void SMARTSTACK_EXPORT endSession() { SmartStack::Stack::endSession(); }
 
-void printStack() { SmartStack::Stack::printCurrentStack(); }
+void SMARTSTACK_EXPORT printStack() { SmartStack::Stack::printCurrentStack(); }
 
-void printTimingReport(
+void SMARTSTACK_EXPORT printTimingReport(
     SmartStack::Stack::SortType sortType = SmartStack::Stack::SortType::Time,
     SmartStack::Stack::SortOrder sortOrder =
         SmartStack::Stack::SortOrder::Decending) {
   SmartStack::Stack::printTimingReport(sortType, sortOrder);
 }
 
-void saveTimingReport(
+void SMARTSTACK_EXPORT saveTimingReport(
     const std::string &filename,
     SmartStack::Stack::SortType sortType = SmartStack::Stack::SortType::Time,
     SmartStack::Stack::SortOrder sortOrder =
@@ -56,8 +59,8 @@ void saveTimingReport(
   SmartStack::Stack::saveTimingReport(filename, sortType, sortOrder);
 }
 
-Instrumentation addInstrumentation(const std::string &functionName,
-                                   bool showStack = false) {
+Instrumentation SMARTSTACK_EXPORT
+addInstrumentation(const std::string &functionName, bool showStack = false) {
   return SmartStack::Instrumentation(functionName, showStack);
 }
 

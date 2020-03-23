@@ -21,16 +21,18 @@
 
 #include <chrono>
 
+#include "smartstack_global.h"
+
 class Timer {
  public:
-  Timer();
-  void startClock();
-  void stopClock();
-  long long elapsed() const;
-  long long startTime() const;
-  long long endTime() const;
-  long long lastElapsed() const;
-  bool running() const;
+  SMARTSTACK_EXPORT Timer();
+  void SMARTSTACK_EXPORT startClock();
+  void SMARTSTACK_EXPORT stopClock();
+  long long SMARTSTACK_EXPORT elapsed() const;
+  long long SMARTSTACK_EXPORT startTime() const;
+  long long SMARTSTACK_EXPORT endTime() const;
+  long long SMARTSTACK_EXPORT lastElapsed() const;
+  bool SMARTSTACK_EXPORT running() const;
 
  private:
   long long m_totalElapsed;

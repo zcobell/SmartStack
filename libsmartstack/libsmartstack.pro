@@ -13,6 +13,7 @@ HEADERS += \
   function.h \
   instrumentation.h \
   smartstack.h \
+  smartstack_global.h \
   stack.h \
   timer.h
 
