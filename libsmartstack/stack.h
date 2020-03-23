@@ -41,6 +41,9 @@ class Stack {
   static void printCurrentStack();
   static void printTimingReport(const Stack::SortType &st = Time,
                                 const Stack::SortOrder &so = Decending);
+  static void saveTimingReport(const std::string &filename,
+                               const Stack::SortType &st = Time,
+                               const Stack::SortOrder &so = Decending);
   static bool sessionStarted();
 
  private:
@@ -58,11 +61,15 @@ class Stack {
   void m_endFunction();
   void m_startFunction(const std::string &functionName);
   void m_printCurrentStack(const std::string &message = std::string());
-  void m_printTimingReport(const SortType &st, const SortOrder &so);
+  void m_printTimingReport(const std::vector<std::string> &report);
+  void m_saveTimimgReport(const std::vector<std::string> &report,
+                          const std::string &filename);
   void sortFunctions(const SortType &st, const SortOrder &so);
   void getSortCodes(std::string &calls, std::string &duration,
                     std::string &meanDuration, const Stack::SortType &st,
                     const Stack::SortOrder &so);
+  std::vector<std::string> generateTimingReport(const SortType &st,
+                                                const SortOrder &so);
 
   void writeHeader();
   void writeFooter();

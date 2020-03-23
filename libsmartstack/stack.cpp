@@ -19,6 +19,7 @@
 #include "stack.h"
 
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 
 using namespace SmartStack;
@@ -87,7 +88,16 @@ void Stack::endFunction(bool showStack) {
 void Stack::printCurrentStack() { Stack::get().m_printCurrentStack(); }
 
 void Stack::printTimingReport(const SortType &st, const SortOrder &so) {
-  Stack::get().m_printTimingReport(st, so);
+  std::vector<std::string> report = Stack::get().generateTimingReport(st, so);
+  Stack::get().m_printTimingReport(report);
+}
+
+void Stack::saveTimingReport(const std::string &filename,
+                             const Stack::SortType &st,
+                             const Stack::SortOrder &so) {
+  std::vector<std::string> report = Stack::get().generateTimingReport(st, so);
+  Stack::get().m_saveTimimgReport(report, filename);
+  return;
 }
 
 bool Stack::sessionStarted() { return Stack::get().m_sessionStarted(); }
@@ -214,17 +224,23 @@ void Stack::getSortCodes(std::string &calls, std::string &duration,
   return;
 }
 
-void Stack::m_printTimingReport(const SortType &st, const SortOrder &so) {
+std::vector<std::string> Stack::generateTimingReport(const SortType &st,
+                                                     const SortOrder &so) {
   this->sortFunctions(st, so);
   std::string callCode, durationCode, meanDurationCode;
   this->getSortCodes(callCode, durationCode, meanDurationCode, st, so);
-  std::cout << "Function report for: " << this->m_sessionName << std::endl;
-  // clang-format off
-    std::cout << "|----------|--------------------------------|-------------|--------------------|-----------------------|" << std::endl;
-    std::cout << "|   Rank   |         Function Name          | " << callCode << " Calls   |  "
-              << durationCode << " Duration (s)  | " << meanDurationCode << " Mean Duration (s) |" << std::endl;
-    std::cout << "|----------|--------------------------------|-------------|--------------------|-----------------------|" << std::endl;
-  // clang-format on
+
+  std::vector<std::string> table;
+  table.push_back("Function report for: " + this->m_sessionName);
+  table.push_back(
+      "|----------|--------------------------------|-------------|-------------"
+      "-------|-----------------------|");
+  table.push_back("|   Rank   |         Function Name          | " + callCode +
+                  " Calls   |  " + durationCode + " Duration (s)  | " +
+                  meanDurationCode + " Mean Duration (s) |");
+  table.push_back(
+      "|----------|--------------------------------|-------------|-------------"
+      "-------|-----------------------|");
 
   size_t i = 0;
   for (auto &f : this->m_functions) {
@@ -235,13 +251,31 @@ void Stack::m_printTimingReport(const SortType &st, const SortOrder &so) {
     long long mt = f->meanDuration() / 1e6;
     double mts = static_cast<double>(mt) +
                  static_cast<double>(f->meanDuration() - mt) / 1e6;
-
-    printf("| %8zu | %30s | %11lld |       %6.6e |          %6.6e |\n", i,
-           f->name().c_str(), f->numCalls(), ts, mts);
+    char line[200];
+    int len = snprintf(
+        line, 200, "| %8zu | %30s | %11lld |       %6.6e |          %6.6e |",
+        i, f->name().c_str(), f->numCalls(), ts, mts);
+    table.push_back(line);
   }
-  fflush(stdout);
-  // clang-format off
-  std::cout << "|----------|--------------------------------|-------------|--------------------|-----------------------|" << std::endl;
-  // clang-format on
+  table.push_back(
+      "|----------|--------------------------------|-------------|-------------"
+      "-------|-----------------------|");
+  return table;
+}
+
+void Stack::m_printTimingReport(const std::vector<std::string> &report) {
+  for (auto &s : report) {
+    std::cout << s << std::endl;
+  }
+  return;
+}
+
+void Stack::m_saveTimimgReport(const std::vector<std::string> &report,
+                               const std::string &filename) {
+  std::ofstream output(filename);
+  for (auto &s : report) {
+    output << s << std::endl;
+  }
+  output.close();
   return;
 }

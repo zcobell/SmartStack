@@ -29,6 +29,7 @@ void* addSmartStackFtn(char* functionName);
 void deleteSmartStackFtn(void* ptr);
 void printFunctionStackFtn();
 void printTimingReportFtn(int sortType = 20000, int sortOrder = 10001);
+void saveTimingReportFtn(char* filename, int sortType = 20000, int sortOrder = 10001);
 }
 
 constexpr std::array<SmartStack::Stack::SortType, 3> c_sortTypeList = {
@@ -63,4 +64,10 @@ void printTimingReportFtn(int sortType, int sortOrder) {
   SmartStack::Stack::SortType c_sortType = c_sortTypeList[sortType - 20000];
   SmartStack::Stack::SortOrder c_sortOrder = c_sortOrderList[sortOrder - 10000];
   SmartStack::printTimingReport(c_sortType, c_sortOrder);
+}
+
+void saveTimingReportFtn(char* filename, int sortType, int sortOrder) {
+  SmartStack::Stack::SortType c_sortType = c_sortTypeList[sortType - 20000];
+  SmartStack::Stack::SortOrder c_sortOrder = c_sortOrderList[sortOrder - 10000];
+  SmartStack::Stack::saveTimingReport(filename, c_sortType, c_sortOrder);
 }

@@ -51,9 +51,17 @@
                 SUBROUTINE c_printTimingReport(SORT_TYPE,SORT_ORDER) BIND(C,NAME="printTimingReportFtn")
                     USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT
                     IMPLICIT NONE
-                    INTEGER(C_INT),VALUE :: SORT_TYPE
-                    INTEGER(C_INT),VALUE :: SORT_ORDER
+                    INTEGER(KIND=C_INT),VALUE :: SORT_TYPE
+                    INTEGER(KIND=C_INT),VALUE :: SORT_ORDER
                 END SUBROUTINE c_printTimingReport
+
+                SUBROUTINE c_saveTimingReport(FILENAME,SORT_TYPE,SORT_ORDER) BIND(C,NAME="saveTimingReportFtn")
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_CHAR,C_INT
+                    IMPLICIT NONE
+                    CHARACTER(KIND=C_CHAR),INTENT(IN)    :: FILENAME
+                    INTEGER(KIND=C_INT),INTENT(IN),VALUE :: SORT_TYPE
+                    INTEGER(KIND=C_INT),INTENT(IN),VALUE :: SORT_ORDER
+                END SUBROUTINE c_saveTimingReport
             END INTERFACE
 
             CONTAINS
@@ -107,5 +115,25 @@
                     CALL c_printTimingReport(F_SORT_TYPE,F_SORT_ORDER)
                 END SUBROUTINE SmartStack_printTimingReport
 
+                SUBROUTINE SmartStack_saveTimingReport(FILENAME,SORT_TYPE,SORT_ORDER)
+                    USE,INTRINSIC    :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_NULL_CHAR
+                    IMPLICIT NONE
+                    CHARACTER(*),INTENT(IN)     :: FILENAME
+                    INTEGER,OPTIONAL,INTENT(IN) :: SORT_TYPE
+                    INTEGER,OPTIONAL,INTENT(IN) :: SORT_ORDER
+                    INTEGER                     :: F_SORT_TYPE
+                    INTEGER                     :: F_SORT_ORDER
+                    IF(PRESENT(SORT_TYPE))THEN
+                        F_SORT_TYPE = SORT_TYPE
+                    ELSE
+                        F_SORT_TYPE = SMARTSTACK_SORTTIME
+                    ENDIF
+                    IF(PRESENT(SORT_ORDER))THEN
+                        F_SORT_ORDER = SORT_ORDER
+                    ELSE
+                        F_SORT_ORDER = SMARTSTACK_SORTDECENDING
+                    ENDIF
+                    CALL c_saveTimingReport(FILENAME//C_NULL_CHAR,F_SORT_TYPE,F_SORT_ORDER)
+                END SUBROUTINE SmartStack_saveTimingReport
 
         END MODULE SMARTSTACKMODULE

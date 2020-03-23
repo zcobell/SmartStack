@@ -37,5 +37,6 @@
             CALL SMART2()
 
             CALL SmartStack_printTimingReport()
+            CALL SmartStack_saveTimingReport("report.txt",SmartStack_SortCalls,SmartStack_SortAscending)
 
         END PROGRAM smartstack_test
