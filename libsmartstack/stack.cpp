@@ -159,7 +159,7 @@ void Stack::m_endFunction() {
 
 void Stack::m_printCurrentStack(const std::string &message) {
   bool first = true;
-  std::cout << "[Stack]: ";
+  std::cout << "[Stack " << this->m_sessionName << "]: ";
   for (const auto &f : this->m_functionStack) {
     if (!first) {
       std::cout << " --> " << f->name();
