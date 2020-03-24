@@ -7,17 +7,18 @@
 
             SUBROUTINE Smart1
                 IMPLICIT NONE
-                TYPE(SMARTSTACK) :: ss
+                TYPE(SMARTSTACK),ALLOCATABLE :: ss
                 ss = SmartStack("Smart1")
+                ss%initialize = .TRUE.
                 CALL SmartStack_printCurrentStackTrace()
-                CALL SMART2()
                 CALL SMART2()
             END SUBROUTINE Smart1
             
             SUBROUTINE Smart2
                 IMPLICIT NONE
-                TYPE(SMARTSTACK) :: ss
+                TYPE(SMARTSTACK),ALLOCATABLE :: ss
                 ss = SmartStack("Smart2")
+                ss%initialize = .TRUE.
                 CALL SmartStack_printCurrentStackTrace()
             END SUBROUTINE Smart2
 
@@ -27,10 +28,11 @@
         PROGRAM smartstack_test
             USE sample
             IMPLICIT NONE
-            TYPE(SMARTSTACK) :: ss
+            TYPE(SMARTSTACK),ALLOCATABLE :: ss
 
             CALL SmartStack_StartSession("TestSession")
-            ss = SmartStack("main")
+            ss = SmartStack("MAIN")
+            ss%initialize = .TRUE.
 
             CALL SMART1()
             CALL SMART1()

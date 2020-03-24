@@ -11,10 +11,11 @@
             INTEGER,PARAMETER :: SMARTSTACK_SORTCALLS     = 20002
 
             TYPE SMARTSTACK
-                PRIVATE
-                TYPE(C_PTR) :: ptr
+                LOGICAL,PUBLIC      :: initialize = .TRUE.
+                TYPE(C_PTR),PRIVATE :: ptr
                 CONTAINS
-                    FINAL :: destructor
+                    FINAL                 :: destructor
+                    PROCEDURE, PASS(THIS) :: init => init_t
             END TYPE SMARTSTACK
 
             INTERFACE SMARTSTACK
@@ -66,17 +67,25 @@
 
             CONTAINS
 
-                FUNCTION constructor(function_name) RESULT(this)
+                SUBROUTINE init_t(this,function_name)
                     USE,INTRINSIC    :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_NULL_CHAR
                     IMPLICIT NONE
-                    CHARACTER(*)     :: function_name
-                    TYPE(SMARTSTACK) :: this
+                    CLASS(SMARTSTACK),INTENT(INOUT) :: this
+                    CHARACTER(*),INTENT(IN)         :: function_name
+                END SUBROUTINE init_t
+
+                FUNCTION constructor(function_name) RESULT(this)
+                    USE,INTRINSIC    :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_NULL_CHAR
+                    TYPE(SMARTSTACK)        :: this
+                    CHARACTER(*),INTENT(IN) :: function_name
+                    this%initialize = .FALSE.
                     this%ptr = c_createSmartStack(function_name//C_NULL_CHAR)
                 END FUNCTION constructor
 
                 SUBROUTINE destructor(this)
                     IMPLICIT NONE
                     TYPE(SMARTSTACK),INTENT(IN) :: this
+                    IF(.NOT.this%initialize)RETURN
                     CALL c_deleteSmartStack(this%ptr)
                 END SUBROUTINE destructor
 
