@@ -25,11 +25,13 @@
 extern "C" {
 void startSessionFtn(char* sessionName);
 void endSessionFtn();
+void* addSmartStackShowFtn(char* functionName);
 void* addSmartStackFtn(char* functionName);
 void deleteSmartStackFtn(void* ptr);
 void printFunctionStackFtn();
 void printTimingReportFtn(int sortType = 20000, int sortOrder = 10001);
-void saveTimingReportFtn(char* filename, int sortType = 20000, int sortOrder = 10001);
+void saveTimingReportFtn(char* filename, int sortType = 20000,
+                         int sortOrder = 10001);
 }
 
 constexpr std::array<SmartStack::Stack::SortType, 3> c_sortTypeList = {
@@ -49,6 +51,12 @@ void endSessionFtn() { SmartStack::endSession(); }
 void* addSmartStackFtn(char* functionName) {
   SmartStack::Instrumentation* s =
       new SmartStack::Instrumentation(functionName);
+  return (void*)s;
+}
+
+void* addSmartStackShowFtn(char* functionName) {
+  SmartStack::Instrumentation* s =
+      new SmartStack::Instrumentation(functionName, true);
   return (void*)s;
 }
 

@@ -23,11 +23,19 @@
             END INTERFACE SMARTSTACK
 
             INTERFACE
-                TYPE(C_PTR) FUNCTION c_createSmartStack(functionName) BIND(C,NAME="addSmartStackFtn") RESULT(ptr)
+                TYPE(C_PTR) FUNCTION c_createSmartStack(functionName) &
+                        BIND(C,NAME="addSmartStackFtn") RESULT(ptr)
                     USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR
                     IMPLICIT NONE
                     CHARACTER(KIND=C_CHAR),INTENT(IN) :: functionName
                 END FUNCTION c_createSmartStack
+                
+                TYPE(C_PTR) FUNCTION c_createSmartStackShowTrace(functionName) &
+                        BIND(C,NAME="addSmartStackShowFtn") RESULT(ptr)
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR
+                    IMPLICIT NONE
+                    CHARACTER(KIND=C_CHAR),INTENT(IN) :: functionName
+                END FUNCTION c_createSmartStackShowTrace
 
                 SUBROUTINE c_deleteSmartStack(ptr) BIND(C,NAME="deleteSmartStackFtn")
                     USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_PTR
@@ -49,14 +57,16 @@
                     IMPLICIT NONE
                 END SUBROUTINE c_printStack
 
-                SUBROUTINE c_printTimingReport(SORT_TYPE,SORT_ORDER) BIND(C,NAME="printTimingReportFtn")
+                SUBROUTINE c_printTimingReport(SORT_TYPE,SORT_ORDER) &
+                        BIND(C,NAME="printTimingReportFtn")
                     USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT
                     IMPLICIT NONE
                     INTEGER(KIND=C_INT),VALUE :: SORT_TYPE
                     INTEGER(KIND=C_INT),VALUE :: SORT_ORDER
                 END SUBROUTINE c_printTimingReport
 
-                SUBROUTINE c_saveTimingReport(FILENAME,SORT_TYPE,SORT_ORDER) BIND(C,NAME="saveTimingReportFtn")
+                SUBROUTINE c_saveTimingReport(FILENAME,SORT_TYPE,SORT_ORDER) &
+                        BIND(C,NAME="saveTimingReportFtn")
                     USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_CHAR,C_INT
                     IMPLICIT NONE
                     CHARACTER(KIND=C_CHAR),INTENT(IN)    :: FILENAME
@@ -74,12 +84,24 @@
                     CHARACTER(*),INTENT(IN)         :: function_name
                 END SUBROUTINE init_t
 
-                FUNCTION constructor(function_name) RESULT(this)
-                    USE,INTRINSIC    :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_NULL_CHAR
-                    TYPE(SMARTSTACK)        :: this
-                    CHARACTER(*),INTENT(IN) :: function_name
+                FUNCTION constructor(function_name,showStack) RESULT(this)
+                    USE,INTRINSIC                   :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_BOOL,&
+                                                                                C_NULL_CHAR
+                    LOGICAL,INTENT(IN),OPTIONAL     :: showStack                                                                            
+                    TYPE(SMARTSTACK)                :: this
+                    CHARACTER(*),INTENT(IN)         :: function_name
+                    LOGICAL                         :: doShowStack
                     this%initialize = .FALSE.
-                    this%ptr = c_createSmartStack(function_name//C_NULL_CHAR)
+                    IF(PRESENT(showStack))THEN
+                        doShowStack = showStack
+                    ELSE
+                        doShowStack = .FALSE.
+                    ENDIF
+                    IF(doShowStack)THEN
+                        this%ptr = c_createSmartStackShowTrace(function_name//C_NULL_CHAR)
+                    ELSE
+                        this%ptr = c_createSmartStack(function_name//C_NULL_CHAR)
+                    ENDIF
                 END FUNCTION constructor
 
                 SUBROUTINE destructor(this)

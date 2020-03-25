@@ -8,18 +8,16 @@
             SUBROUTINE Smart1
                 IMPLICIT NONE
                 TYPE(SMARTSTACK),ALLOCATABLE :: ss
-                ss = SmartStack("Smart1")
+                ss = SmartStack("Smart1",.TRUE.)
                 ss%initialize = .TRUE.
-                CALL SmartStack_printCurrentStackTrace()
                 CALL SMART2()
             END SUBROUTINE Smart1
             
             SUBROUTINE Smart2
                 IMPLICIT NONE
                 TYPE(SMARTSTACK),ALLOCATABLE :: ss
-                ss = SmartStack("Smart2")
+                ss = SmartStack("Smart2",.TRUE.)
                 ss%initialize = .TRUE.
-                CALL SmartStack_printCurrentStackTrace()
             END SUBROUTINE Smart2
 
         END MODULE sample
