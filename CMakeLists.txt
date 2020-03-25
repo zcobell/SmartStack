@@ -140,6 +140,29 @@ ENDIF(SMARTSTACK_BUILD_BENCHMARK)
 ###########################################################################
 
 ###########################################################################
+# ABSEIL SWISS TABLES
+###########################################################################
+IF(NOT CYGWIN)
+    OPTION(USE_ABSEIL_FLAT_MAP "Use Abseil hash table to increase speed" ON)
+    IF(USE_ABSEIL_FLAT_MAP)
+        if(MSVC)
+          # /wd4005  macro-redefinition
+          # /wd4068  unknown pragma
+          # /wd4244  conversion from 'type1' to 'type2'
+          # /wd4267  conversion from 'size_t' to 'type2'
+          # /wd4800  force value to bool 'true' or 'false' (performance warning)
+          add_compile_options(/wd4005 /wd4068 /wd4244 /wd4267 /wd4800)
+          add_definitions(/DNOMINMAX /DWIN32_LEAN_AND_MEAN=1 /D_CRT_SECURE_NO_WARNINGS)
+        endif(MSVC)
+        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/abseil-cpp EXCLUDE_FROM_ALL)
+        MESSAGE(STATUS "Using Google's Flat Map (from Abseil) instead of unordered_map for performance")
+    ENDIF(USE_ABSEIL_FLAT_MAP)    
+ELSE(NOT CYGWIN)
+    SET(USE_ABSEIL_FLAT_MAP FALSE)
+ENDIF(NOT CYGWIN)
+###########################################################################
+
+###########################################################################
 #  SET THE LOCATION OF TEMPORARY STATIC LIBS
 ###########################################################################
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles)
@@ -189,6 +212,16 @@ INSTALL( FILES ${CMAKE_CURRENT_BINARY_DIR}/smartstackConfigVersion.cmake DESTINA
 
 SET_TARGET_PROPERTIES(smartstack PROPERTIES CMAKE_CXX_VISIBILITY_PRESET hidden)
 SET_TARGET_PROPERTIES(smartstack PROPERTIES CMAKE_CXX_INLINES_HIDDEN YES)
+
+IF(SMARTSTACK_BUILD_BENCHMARK)
+    TARGET_COMPILE_DEFINITIONS( smartstack PRIVATE SMARTSTACK_BENCHMARKING )
+ENDIF(SMARTSTACK_BUILD_BENCHMARK)    
+
+IF(USE_ABSEIL_FLAT_MAP)
+    TARGET_LINK_LIBRARIES( smartstack absl::flat_hash_map)
+    ADD_DEPENDENCIES( smartstack absl::flat_hash_map)
+    TARGET_COMPILE_DEFINITIONS( smartstack PRIVATE USE_ABSEIL_FLAT_MAP )
+ENDIF(USE_ABSEIL_FLAT_MAP)
 
 IF(APPLE)
     SET(CMAKE_MACOSX_RPATH 0)

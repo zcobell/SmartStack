@@ -27,6 +27,12 @@
 #include "function.h"
 #include "smartstack_global.h"
 
+#ifdef USE_ABSEIL_FLAT_MAP
+#include "absl/container/flat_hash_map.h"
+#else
+#include <unordered_map>
+#endif
+
 namespace SmartStack {
 
 class Stack {
@@ -47,14 +53,24 @@ class Stack {
       const Stack::SortOrder &so = Decending);
   static bool SMARTSTACK_EXPORT sessionStarted();
 
+#ifndef SMARTSTACK_BENCHMARKING
  private:
+#else
+#warning This library is being built in benchmarking mode. This is dangerous. You have been warned.
+#endif
+
   bool m_started;
   bool m_firstProfile;
   std::string m_sessionName;
 
   std::vector<std::unique_ptr<Function>> m_functions;
   std::vector<Function *> m_functionStack;
+
+#ifdef USE_ABSEIL_FLAT_MAP
+  absl::flat_hash_map<std::string, Function *> m_functionLookup;
+#else
   std::unordered_map<std::string, Function *> m_functionLookup;
+#endif
 
   bool m_sessionStarted();
   void m_startSession(const std::string &session);
