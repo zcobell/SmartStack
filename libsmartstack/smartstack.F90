@@ -56,6 +56,12 @@
                 SUBROUTINE c_printStack() BIND(C,NAME="printFunctionStackFtn")
                     IMPLICIT NONE
                 END SUBROUTINE c_printStack
+                
+                SUBROUTINE c_printStackMessage(message) BIND(C,NAME="printFunctionStackMessageFtn")
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY: C_CHAR
+                    IMPLICIT NONE
+                    CHARACTER(KIND=C_CHAR),INTENT(IN) :: message
+                END SUBROUTINE c_printStackMessage
 
                 SUBROUTINE c_printTimingReport(SORT_TYPE,SORT_ORDER) &
                         BIND(C,NAME="printTimingReportFtn")
@@ -122,10 +128,16 @@
                     CALL c_endSession()
                 END SUBROUTINE SmartStack_endSession
 
-                SUBROUTINE SmartStack_printCurrentStackTrace()
+                SUBROUTINE SmartStack_printCurrentStack(message)
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_CHAR,C_NULL_CHAR
                     IMPLICIT NONE
-                    CALL c_printStack()
-                END SUBROUTINE SmartStack_printCurrentStackTrace
+                    CHARACTER(*),INTENT(IN),OPTIONAL :: message
+                    IF(PRESENT(message))THEN
+                        CALL c_printStackMessage(message//C_NULL_CHAR)
+                    ELSE
+                        CALL c_printStack()
+                    ENDIF
+                END SUBROUTINE SmartStack_printCurrentStack
 
                 SUBROUTINE SmartStack_printTimingReport(SORT_TYPE,SORT_ORDER)
                     IMPLICIT NONE

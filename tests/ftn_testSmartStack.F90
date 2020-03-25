@@ -18,6 +18,7 @@
                 TYPE(SMARTSTACK),ALLOCATABLE :: ss
                 ss = SmartStack("Smart2",.TRUE.)
                 ss%initialize = .TRUE.
+                CALL SmartStack_printCurrentStack("Hello from Smart2 subroutine")
             END SUBROUTINE Smart2
 
         END MODULE sample

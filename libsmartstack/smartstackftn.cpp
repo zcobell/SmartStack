@@ -29,6 +29,7 @@ void* addSmartStackShowFtn(char* functionName);
 void* addSmartStackFtn(char* functionName);
 void deleteSmartStackFtn(void* ptr);
 void printFunctionStackFtn();
+void printFunctionStackMessageFtn(const char* message);
 void printTimingReportFtn(int sortType = 20000, int sortOrder = 10001);
 void saveTimingReportFtn(char* filename, int sortType = 20000,
                          int sortOrder = 10001);
@@ -67,6 +68,10 @@ void deleteSmartStackFtn(void* ptr) {
 }
 
 void printFunctionStackFtn() { SmartStack::printStack(); }
+
+void printFunctionStackMessageFtn(const char* message) {
+  SmartStack::printStack(message);
+}
 
 void printTimingReportFtn(int sortType, int sortOrder) {
   SmartStack::Stack::SortType c_sortType = c_sortTypeList[sortType - 20000];

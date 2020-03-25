@@ -85,7 +85,9 @@ void Stack::endFunction(bool showStack) {
   Stack::get().m_endFunction();
 }
 
-void Stack::printCurrentStack() { Stack::get().m_printCurrentStack(); }
+void Stack::printCurrentStack(const std::string &message) {
+  Stack::get().m_printCurrentStack(message);
+}
 
 void Stack::printTimingReport(const SortType &st, const SortOrder &so) {
   std::vector<std::string> report = Stack::get().generateTimingReport(st, so);

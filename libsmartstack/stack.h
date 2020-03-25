@@ -45,7 +45,9 @@ class Stack {
   static void SMARTSTACK_EXPORT startFunction(const std::string &functionName,
                                               bool showStack = false);
   static void SMARTSTACK_EXPORT endFunction(bool showStack = false);
-  static void SMARTSTACK_EXPORT printCurrentStack();
+  static void SMARTSTACK_EXPORT
+  printCurrentStack(const std::string &message = std::string());
+
   static void SMARTSTACK_EXPORT printTimingReport(
       const Stack::SortType &st = Time, const Stack::SortOrder &so = Decending);
   static void SMARTSTACK_EXPORT saveTimingReport(

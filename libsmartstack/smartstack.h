@@ -42,7 +42,9 @@ void SMARTSTACK_EXPORT startSession(const std::string &sessionName) {
 
 void SMARTSTACK_EXPORT endSession() { SmartStack::Stack::endSession(); }
 
-void SMARTSTACK_EXPORT printStack() { SmartStack::Stack::printCurrentStack(); }
+void SMARTSTACK_EXPORT printStack(const std::string &message = std::string()) {
+  SmartStack::Stack::printCurrentStack(message);
+}
 
 void SMARTSTACK_EXPORT printTimingReport(
     SmartStack::Stack::SortType sortType = SmartStack::Stack::SortType::Time,
