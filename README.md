@@ -6,7 +6,7 @@ A simple stack tracing and timing library for C++ and Fortran
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/51020adea56f4c04876262d6ce1eb5bd)](https://www.codacy.com/manual/zachary.cobell/SmartStack?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=zcobell/SmartStack&amp;utm_campaign=Badge_Grade)
 
 # Usage
-SmartStack is meant to provide an easy way to generate tracing and timing information from C++ and Fortran codebases with minimal overhead.
+SmartStack is meant to provide an easy way to generate tracing and timing information from C++ and Fortran code bases with minimal overhead.
 
 ## Example Report
 Example report that can be generated. Sorted descending by number of function calls. Reports can be sorted by number of calls, duration, or mean duration in either ascending or descending direction by providing arguments to the reporting functions. 
@@ -47,11 +47,13 @@ Entry and exit tracing can be done by specifying the boolean variable to show th
 ```
 
 ## Benchmarking
-Benchmarking is conducted using the Google Benchmark library. The benchmark looks at toggling the timer for a random function that already exists in the stack and a function that is newly created on a stack. Note that it is expected that the former is the most likely case. The relevent tests below are `bench_lookupExistingFunction` and `bench_lookupNewFunction`. The test `bench_lookupExistingFunction` should be considered as 88.8ns less the inherent overhead of the test which is shown in `bench_vectorRandomLookup`. This means that on the test machine, the time to turn the timer on and off in an existing function is approximately 82ns.
+Benchmarking is conducted using the Google Benchmark library. The benchmark looks at toggling the timer for a random function that already exists in the stack, the same function continuously that already exists, and a function that is newly created on a stack. It is expected that the former is the most likely case. 
+
+The relevant tests below are `bench_lookupRandomExistingFunction`, `bench_lookupSameExistingFunction` and `bench_lookupNewFunction`. The random lookup is has a performance of approximately 12.6 million/second for a random function and 14.3 million/second for the same function continuously. Creating a new function has a performance off about 1.6 million/second. 
 
 The below tests are conducted using the GNU compiler version 9.2.1 and Abseil tables enabled. 
 ```
-2020-03-24 23:22:09
+2020-03-25 13:56:28
 Running ./smartstack_benchmark
 Run on (6 X 2304 MHz CPU s)
 CPU Caches:
@@ -59,20 +61,18 @@ CPU Caches:
   L1 Instruction 32 KiB (x6)
   L2 Unified 256 KiB (x6)
   L3 Unified 16384 KiB (x1)
-Load Average: 0.46, 0.42, 0.32
------------------------------------------------------------------------
-Benchmark                             Time             CPU   Iterations
------------------------------------------------------------------------
-bench_vectorRandomLookup           6.64 ns         6.63 ns     87778624
-bench_getFunctionPointer           26.2 ns         26.2 ns     26292055
-bench_getPointerAndStart           61.9 ns         61.9 ns     10638735
-bench_lookupExistingFunction       88.8 ns         88.8 ns      7206436
-bench_createFunctionString         77.5 ns         77.5 ns      8811919
-bench_lookupNewFunction             752 ns          751 ns      1000000
+Load Average: 0.04, 0.17, 0.24
+----------------------------------------------------------------------------------------------
+Benchmark                                   Time             CPU   Iterations items_per_second
+----------------------------------------------------------------------------------------------
+bench_lookupRandomExistingFunction       79.3 ns         79.3 ns      8106327       12.6049M/s
+bench_lookupSameExistingFunction         69.8 ns         69.8 ns      9615968         14.33M/s
+bench_lookupNewFunction                   602 ns          602 ns      1000000       1.65986M/s
+
 ```
 
 ## C++
-The C++ library provides a series of macros so that only minimal code is needed to annotate functions. The code is initialized by beginning a session, and then by using the macros `ADD_SMARTSTACK("functionName")`. When the function goes out of scope, the timer willl automatically be stopped.
+The C++ library provides a series of macros so that only minimal code is needed to annotate functions. The code is initialized by beginning a session, and then by using the macros `ADD_SMARTSTACK("functionName")`. When the function goes out of scope, the timer will automatically be stopped.
 
 ### Example Usage
 ```C++
