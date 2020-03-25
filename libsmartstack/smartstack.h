@@ -46,6 +46,11 @@ void SMARTSTACK_EXPORT printStack(const std::string &message = std::string()) {
   SmartStack::Stack::printCurrentStack(message);
 }
 
+void SMARTSTACK_EXPORT
+printFunction(const std::string &message = std::string()) {
+  SmartStack::Stack::printCurrentFunction(message);
+}
+
 void SMARTSTACK_EXPORT printTimingReport(
     SmartStack::Stack::SortType sortType = SmartStack::Stack::SortType::Time,
     SmartStack::Stack::SortOrder sortOrder =

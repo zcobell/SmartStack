@@ -28,8 +28,10 @@ void endSessionFtn();
 void* addSmartStackShowFtn(char* functionName);
 void* addSmartStackFtn(char* functionName);
 void deleteSmartStackFtn(void* ptr);
-void printFunctionStackFtn();
-void printFunctionStackMessageFtn(const char* message);
+void printCurrentStackFtn();
+void printCurrentStackMessageFtn(const char* message);
+void printCurrentFunctionFtn();
+void printCurrentFunctionMessageFtn(const char* message);
 void printTimingReportFtn(int sortType = 20000, int sortOrder = 10001);
 void saveTimingReportFtn(char* filename, int sortType = 20000,
                          int sortOrder = 10001);
@@ -67,10 +69,16 @@ void deleteSmartStackFtn(void* ptr) {
   delete s;
 }
 
-void printFunctionStackFtn() { SmartStack::printStack(); }
+void printCurrentStackFtn() { SmartStack::printStack(); }
 
-void printFunctionStackMessageFtn(const char* message) {
+void printCurrentStackMessageFtn(const char* message) {
   SmartStack::printStack(message);
+}
+
+void printCurrentFunctionFtn() { SmartStack::printFunction(); }
+
+void printCurrentFunctionMessageFtn(const char* message) {
+  SmartStack::printFunction(message);
 }
 
 void printTimingReportFtn(int sortType, int sortOrder) {

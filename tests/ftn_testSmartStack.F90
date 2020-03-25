@@ -10,6 +10,7 @@
                 TYPE(SMARTSTACK),ALLOCATABLE :: ss
                 ss = SmartStack("Smart1",.TRUE.)
                 ss%initialize = .TRUE.
+                CALL SmartStack_printCurrentFunction("Hello from Smart1")
                 CALL SMART2()
             END SUBROUTINE Smart1
             

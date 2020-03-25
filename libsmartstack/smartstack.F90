@@ -53,15 +53,25 @@
                     IMPLICIT NONE
                 END SUBROUTINE c_endSession
 
-                SUBROUTINE c_printStack() BIND(C,NAME="printFunctionStackFtn")
+                SUBROUTINE c_printStack() BIND(C,NAME="printCurrentStackFtn")
                     IMPLICIT NONE
                 END SUBROUTINE c_printStack
                 
-                SUBROUTINE c_printStackMessage(message) BIND(C,NAME="printFunctionStackMessageFtn")
+                SUBROUTINE c_printStackMessage(message) BIND(C,NAME="printCurrentStackMessageFtn")
                     USE,INTRINSIC :: ISO_C_BINDING,ONLY: C_CHAR
                     IMPLICIT NONE
                     CHARACTER(KIND=C_CHAR),INTENT(IN) :: message
                 END SUBROUTINE c_printStackMessage
+                
+                SUBROUTINE c_printCurrentFunction() BIND(C,NAME="printCurrentFunctionFtn")
+                    IMPLICIT NONE
+                END SUBROUTINE c_printCurrentFunction
+                
+                SUBROUTINE c_printCurrentFunctionMessage(message) BIND(C,NAME="printCurrentFunctionMessageFtn")
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY: C_CHAR
+                    IMPLICIT NONE
+                    CHARACTER(KIND=C_CHAR),INTENT(IN) :: message
+                END SUBROUTINE c_printCurrentFunctionMessage
 
                 SUBROUTINE c_printTimingReport(SORT_TYPE,SORT_ORDER) &
                         BIND(C,NAME="printTimingReportFtn")
@@ -138,6 +148,17 @@
                         CALL c_printStack()
                     ENDIF
                 END SUBROUTINE SmartStack_printCurrentStack
+                
+                SUBROUTINE SmartStack_printCurrentFunction(message)
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_CHAR,C_NULL_CHAR
+                    IMPLICIT NONE
+                    CHARACTER(*),INTENT(IN),OPTIONAL :: message
+                    IF(PRESENT(message))THEN
+                        CALL c_printCurrentFunctionMessage(message//C_NULL_CHAR)
+                    ELSE
+                        CALL c_printCurrentFunction()
+                    ENDIF
+                END SUBROUTINE SmartStack_printCurrentFunction
 
                 SUBROUTINE SmartStack_printTimingReport(SORT_TYPE,SORT_ORDER)
                     IMPLICIT NONE

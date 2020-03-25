@@ -47,7 +47,8 @@ class Stack {
   static void SMARTSTACK_EXPORT endFunction(bool showStack = false);
   static void SMARTSTACK_EXPORT
   printCurrentStack(const std::string &message = std::string());
-
+  static void SMARTSTACK_EXPORT
+  printCurrentFunction(const std::string &message = std::string());
   static void SMARTSTACK_EXPORT printTimingReport(
       const Stack::SortType &st = Time, const Stack::SortOrder &so = Decending);
   static void SMARTSTACK_EXPORT saveTimingReport(
@@ -79,6 +80,7 @@ class Stack {
   void m_endSession();
   void m_endFunction();
   void m_startFunction(const std::string &functionName);
+  void m_printCurrentFunction(const std::string &message = std::string());
   void m_printCurrentStack(const std::string &message = std::string());
   void m_printTimingReport(const std::vector<std::string> &report);
   void m_saveTimimgReport(const std::vector<std::string> &report,

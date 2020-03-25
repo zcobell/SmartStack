@@ -89,6 +89,10 @@ void Stack::printCurrentStack(const std::string &message) {
   Stack::get().m_printCurrentStack(message);
 }
 
+void Stack::printCurrentFunction(const std::string &message) {
+  Stack::get().m_printCurrentFunction(message);
+}
+
 void Stack::printTimingReport(const SortType &st, const SortOrder &so) {
   std::vector<std::string> report = Stack::get().generateTimingReport(st, so);
   Stack::get().m_printTimingReport(report);
@@ -145,6 +149,12 @@ void Stack::m_startFunction(const std::string &functionName) {
   f->startFunction();
   this->m_functionStack.push_back(f);
   return;
+}
+
+void Stack::m_printCurrentFunction(const std::string &message) {
+  std::cout << "[Stack " << this->m_sessionName
+            << "]: " << this->m_functionStack.back()->name() << ": " << message
+            << std::endl;
 }
 
 void Stack::m_endFunction() {
