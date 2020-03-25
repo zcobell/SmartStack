@@ -22,6 +22,7 @@ Function report for: TestSession
 ```
 
 ### Example Tracing
+Tracing can be done at any point in the code using the tracing function to generate output like below. 
 ```
 [Stack MySession]: main --> Smart1
 [Stack MySession]: main --> Smart1 --> Smart2
@@ -31,11 +32,24 @@ Function report for: TestSession
 [Stack MySession]: main --> Smart1 --> Smart2
 [Stack MySession]: main --> Smart2
 ```
+Entry and exit tracing can be done by specifying the boolean variable to show the stack at object creation for tracing like below. Note that the option is specific to each function.
+```
+[Stack TestSession]: MAIN --> Smart1: Enter
+[Stack TestSession]: MAIN --> Smart1 --> Smart2: Enter
+[Stack TestSession]: MAIN --> Smart1 --> Smart2: Return
+[Stack TestSession]: MAIN --> Smart1: Return
+[Stack TestSession]: MAIN --> Smart1: Enter
+[Stack TestSession]: MAIN --> Smart1 --> Smart2: Enter
+[Stack TestSession]: MAIN --> Smart1 --> Smart2: Return
+[Stack TestSession]: MAIN --> Smart1: Return
+[Stack TestSession]: MAIN --> Smart2: Enter
+[Stack TestSession]: MAIN --> Smart2: Return
+```
 
 ## Benchmarking
-Benchmarking is conducted using the Google Benchmark library. The benchmark looks at toggling the timer for a function that already exists in the stack and a function that is newly created on a stack. Note that it is expected that the former is the most likely case.
+Benchmarking is conducted using the Google Benchmark library. The benchmark looks at toggling the timer for a random function that already exists in the stack and a function that is newly created on a stack. Note that it is expected that the former is the most likely case.
 ```
-2020-03-22 23:08:26
+2020-03-24 21:53:20
 Running ./smartstack_benchmark
 Run on (6 X 2304 MHz CPU s)
 CPU Caches:
@@ -43,12 +57,13 @@ CPU Caches:
   L1 Instruction 32 KiB (x6)
   L2 Unified 256 KiB (x6)
   L3 Unified 16384 KiB (x1)
-Load Average: 0.00, 0.02, 0.00
+Load Average: 0.07, 0.06, 0.01
 -----------------------------------------------------------------------
 Benchmark                             Time             CPU   Iterations
 -----------------------------------------------------------------------
-bench_lookupExistingFunction        517 ns          514 ns      1237228
-bench_lookupNewFunction            1194 ns         1190 ns       815840
+bench_lookupExistingFunction        502 ns          499 ns      1184984
+bench_lookupNewFunction            1204 ns         1203 ns       707920
+
 ```
 
 ## C++
