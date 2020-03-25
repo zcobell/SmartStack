@@ -55,9 +55,9 @@ bool sortFunctionMeanTimeAscending(const std::unique_ptr<Function> &a,
 }
 
 Stack::Stack() : m_started(false), m_firstProfile(true) {
-  this->m_functionStack.reserve(100);
-  this->m_functions.reserve(100);
-  this->m_functionLookup.reserve(100);
+  this->m_functionStack.reserve(5000);
+  this->m_functions.reserve(5000);
+  this->m_functionLookup.reserve(5000);
 }
 
 Stack::~Stack() { this->m_endSession(); }
