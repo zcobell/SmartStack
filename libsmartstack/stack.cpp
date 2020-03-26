@@ -93,6 +93,14 @@ void Stack::printCurrentFunction(const std::string &message) {
   Stack::get().m_printCurrentFunction(message);
 }
 
+std::string Stack::getCurrentStack() {
+  return Stack::get().m_getCurrentStack();
+}
+
+std::string Stack::getCurrentFunction() {
+  return Stack::get().m_getCurrentFunction();
+}
+
 void Stack::printTimingReport(const SortType &st, const SortOrder &so) {
   std::vector<std::string> report = Stack::get().generateTimingReport(st, so);
   Stack::get().m_printTimingReport(report);
@@ -151,12 +159,6 @@ void Stack::m_startFunction(const std::string &functionName) {
   return;
 }
 
-void Stack::m_printCurrentFunction(const std::string &message) {
-  std::cout << "[Stack " << this->m_sessionName
-            << "]: " << this->m_functionStack.back()->name() << ": " << message
-            << std::endl;
-}
-
 void Stack::m_endFunction() {
   Function *f = this->m_functionStack.back();
   f->endFunction();
@@ -170,21 +172,38 @@ void Stack::m_endFunction() {
 }
 
 void Stack::m_printCurrentStack(const std::string &message) {
+  if (message != std::string()) {
+    std::cout << this->m_getCurrentStack() << ": " << message << std::endl;
+  } else {
+    std::cout << this->m_getCurrentStack() << std::endl;
+  }
+}
+
+void Stack::m_printCurrentFunction(const std::string &message) {
+  if (message != std::string()) {
+    std::cout << this->m_getCurrentFunction() << ": " << message << std::endl;
+  } else {
+    std::cout << this->m_getCurrentFunction() << std::endl;
+  }
+}
+
+std::string Stack::m_getCurrentStack() {
   bool first = true;
-  std::cout << "[Stack " << this->m_sessionName << "]: ";
+  std::string s = "[Stack " + this->m_sessionName + "]: ";
   for (const auto &f : this->m_functionStack) {
     if (!first) {
-      std::cout << " --> " << f->name();
+      s += " --> " + f->name();
     } else {
-      std::cout << f->name();
+      s += f->name();
       first = false;
     }
   }
-  if (message != std::string()) {
-    std::cout << ": " << message;
-  }
-  std::cout << std::endl;
-  std::cout.flush();
+  return s;
+}
+
+std::string Stack::m_getCurrentFunction() {
+  return "[Stack " + this->m_sessionName +
+         "]: " + this->m_functionStack.back()->name();
 }
 
 void Stack::sortFunctions(const SortType &st, const SortOrder &so) {

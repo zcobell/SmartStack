@@ -89,9 +89,33 @@
                     INTEGER(KIND=C_INT),INTENT(IN),VALUE :: SORT_TYPE
                     INTEGER(KIND=C_INT),INTENT(IN),VALUE :: SORT_ORDER
                 END SUBROUTINE c_saveTimingReport
+
+                SUBROUTINE c_getCurrentStack() BIND(C,NAME="getCurrentStackFtn")
+                    IMPLICIT NONE
+                END SUBROUTINE c_getCurrentStack
+
+                SUBROUTINE c_getCurrentFunction() BIND(C,NAME="getCurrentFunctionFtn")
+                    IMPLICIT NONE
+                END SUBROUTINE c_getCurrentFunction
+
             END INTERFACE
 
+            CHARACTER(:),ALLOCATABLE,PRIVATE :: c_string_buffer
+            INTEGER,PRIVATE                  :: c_string_length
+
             CONTAINS
+
+                SUBROUTINE c2f_copyStringToFortran(c_string,c_string_len) BIND(C,NAME="c2f_copyStringToFortran")
+                    USE,INTRINSIC                        :: ISO_C_BINDING,ONLY:C_CHAR,C_INT
+                    IMPLICIT NONE
+                    CHARACTER(KIND=C_CHAR),INTENT(IN)    :: c_string(*)
+                    INTEGER(KIND=C_INT),INTENT(IN),VALUE :: c_string_len
+                    INTEGER                              :: I
+                    IF(ALLOCATED(c_string_buffer))DEALLOCATE(c_string_buffer)
+                    c_string_length = c_string_len
+                    ALLOCATE(CHARACTER(c_string_length) :: c_string_buffer)
+                    FORALL(i=1:c_string_length)c_string_buffer(I:I) = c_string(I)
+                END SUBROUTINE c2f_copyStringToFortran
 
                 SUBROUTINE init_t(this,function_name)
                     USE,INTRINSIC    :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_NULL_CHAR
@@ -159,6 +183,36 @@
                         CALL c_printCurrentFunction()
                     ENDIF
                 END SUBROUTINE SmartStack_printCurrentFunction
+
+                SUBROUTINE SmartStack_getCurrentStack(buffer) 
+                    IMPLICIT NONE
+                    CHARACTER(*),INTENT(OUT) :: buffer
+                    INTEGER                  :: I
+                    CALL c_getCurrentStack()
+                    IF(LEN(buffer).LT.LEN(c_string_buffer))THEN
+                        WRITE(*,'(A)') "SmartStack Error: String buffer overflow detected."//&
+                                       " Increase buffer size"
+                        buffer = ""
+                        RETURN
+                    ENDIF
+                    buffer = c_string_buffer
+                    DEALLOCATE(c_string_buffer)
+                END SUBROUTINE SmartStack_getCurrentStack
+                
+                SUBROUTINE SmartStack_getCurrentFunction(buffer) 
+                    IMPLICIT NONE
+                    CHARACTER(*),INTENT(OUT) :: buffer
+                    INTEGER                  :: I
+                    CALL c_getCurrentFunction()
+                    IF(LEN(buffer).LT.LEN(c_string_buffer))THEN
+                        WRITE(*,'(A)') "SmartStack Error: String buffer overflow detected."//&
+                                       " Increase buffer size"
+                        buffer = ""
+                        RETURN
+                    ENDIF
+                    buffer = c_string_buffer
+                    DEALLOCATE(c_string_buffer)
+                END SUBROUTINE SmartStack_getCurrentFunction
 
                 SUBROUTINE SmartStack_printTimingReport(SORT_TYPE,SORT_ORDER)
                     IMPLICIT NONE

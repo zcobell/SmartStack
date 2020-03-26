@@ -17,6 +17,7 @@
 // along with SmartStack.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------//
 #include <array>
+#include <cstring>
 #include <iostream>
 #include <memory>
 
@@ -35,6 +36,10 @@ void printCurrentFunctionMessageFtn(const char* message);
 void printTimingReportFtn(int sortType = 20000, int sortOrder = 10001);
 void saveTimingReportFtn(char* filename, int sortType = 20000,
                          int sortOrder = 10001);
+void getCurrentStackFtn();
+void getCurrentFunctionFtn();
+
+void c2f_copyStringToFortran(const char*, int n);
 }
 
 constexpr std::array<SmartStack::Stack::SortType, 3> c_sortTypeList = {
@@ -79,6 +84,18 @@ void printCurrentFunctionFtn() { SmartStack::printFunction(); }
 
 void printCurrentFunctionMessageFtn(const char* message) {
   SmartStack::printFunction(message);
+}
+
+void getCurrentStackFtn() {
+  std::string s = SmartStack::getCurrentStack();
+  c2f_copyStringToFortran(s.c_str(), s.size());
+  return;
+}
+
+void getCurrentFunctionFtn() {
+  std::string s = SmartStack::getCurrentFunction();
+  c2f_copyStringToFortran(s.c_str(), s.size());
+  return;
 }
 
 void printTimingReportFtn(int sortType, int sortOrder) {

@@ -66,6 +66,14 @@ void SMARTSTACK_EXPORT saveTimingReport(
   SmartStack::Stack::saveTimingReport(filename, sortType, sortOrder);
 }
 
+std::string SMARTSTACK_EXPORT getCurrentStack() {
+  return SmartStack::Stack::getCurrentStack();
+}
+
+std::string SMARTSTACK_EXPORT getCurrentFunction() {
+  return SmartStack::Stack::getCurrentFunction();
+}
+
 Instrumentation SMARTSTACK_EXPORT
 addInstrumentation(const std::string &functionName, bool showStack = false) {
   return SmartStack::Instrumentation(functionName, showStack);
