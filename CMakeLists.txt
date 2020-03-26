@@ -35,11 +35,11 @@ ENDIF()
 #  GENERAL OPTIONS
 ###########################################################################
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
-PROJECT(SmartStack)
+PROJECT(SmartStack CXX)
 ###########################################################################
 
 ENABLE_LANGUAGE(Fortran)
-ENABLE_LANGUAGE(CXX)
+MARK_AS_ADVANCED(CLEAR CMAKE_Fortran_COMPILER CMAKE_Fortran_FLAGS_DEBUG CMAKE_Fortran_FLAGS_RELEASE)
 
 ###########################################################################
 # Enable running tests
@@ -143,8 +143,8 @@ ENDIF(SMARTSTACK_BUILD_BENCHMARK)
 # ABSEIL SWISS TABLES
 ###########################################################################
 IF(NOT CYGWIN)
-    OPTION(USE_ABSEIL_FLAT_MAP "Use Abseil hash table to increase speed" ON)
-    IF(USE_ABSEIL_FLAT_MAP)
+    OPTION(SMARTSTACK_USE_ABSEIL_FLAT_MAP "Use the Abseil Swiss Tables to increase speed" ON)
+    IF(SMARTSTACK_USE_ABSEIL_FLAT_MAP)
         if(MSVC)
           # /wd4005  macro-redefinition
           # /wd4068  unknown pragma
@@ -155,10 +155,10 @@ IF(NOT CYGWIN)
           add_definitions(/DNOMINMAX /DWIN32_LEAN_AND_MEAN=1 /D_CRT_SECURE_NO_WARNINGS)
         endif(MSVC)
         add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/abseil-cpp EXCLUDE_FROM_ALL)
-        MESSAGE(STATUS "Using Google's Flat Map (from Abseil) instead of unordered_map for performance")
-    ENDIF(USE_ABSEIL_FLAT_MAP)    
+        MESSAGE(STATUS "Using the Abseil Swiss Tables instead of unordered_map for performance")
+    ENDIF(SMARTSTACK_USE_ABSEIL_FLAT_MAP)    
 ELSE(NOT CYGWIN)
-    SET(USE_ABSEIL_FLAT_MAP FALSE)
+    SET(SMARTSTACK_USE_ABSEIL_FLAT_MAP FALSE)
 ENDIF(NOT CYGWIN)
 ###########################################################################
 
@@ -217,11 +217,11 @@ IF(SMARTSTACK_BUILD_BENCHMARK)
     TARGET_COMPILE_DEFINITIONS( smartstack PRIVATE SMARTSTACK_BENCHMARKING )
 ENDIF(SMARTSTACK_BUILD_BENCHMARK)    
 
-IF(USE_ABSEIL_FLAT_MAP)
+IF(SMARTSTACK_USE_ABSEIL_FLAT_MAP)
     TARGET_LINK_LIBRARIES( smartstack absl::flat_hash_map)
     ADD_DEPENDENCIES( smartstack absl::flat_hash_map)
     TARGET_COMPILE_DEFINITIONS( smartstack PRIVATE USE_ABSEIL_FLAT_MAP )
-ENDIF(USE_ABSEIL_FLAT_MAP)
+ENDIF(SMARTSTACK_USE_ABSEIL_FLAT_MAP)
 
 IF(APPLE)
     SET(CMAKE_MACOSX_RPATH 0)
