@@ -39,6 +39,7 @@ class Stack {
  public:
   enum SortOrder { Ascending, Decending };
   enum SortType { Time, MeanTime, Calls };
+  enum TimeUnits { Microseconds, Milliseconds, Seconds, Minutes, Hours };
 
   static void SMARTSTACK_EXPORT startSession(const std::string &session);
   static void SMARTSTACK_EXPORT endSession();
@@ -57,6 +58,7 @@ class Stack {
       const std::string &filename, const Stack::SortType &st = Time,
       const Stack::SortOrder &so = Decending);
   static bool SMARTSTACK_EXPORT sessionStarted();
+  static void SMARTSTACK_EXPORT setReportUnits(const Stack::TimeUnits &units);
 
 #ifndef SMARTSTACK_BENCHMARKING
  private:
@@ -67,6 +69,7 @@ class Stack {
   bool m_started;
   bool m_firstProfile;
   std::string m_sessionName;
+  TimeUnits m_reportUnits;
 
   std::vector<std::unique_ptr<Function>> m_functions;
   std::vector<Function *> m_functionStack;
@@ -87,6 +90,8 @@ class Stack {
   void m_printTimingReport(const std::vector<std::string> &report);
   void m_saveTimimgReport(const std::vector<std::string> &report,
                           const std::string &filename);
+  std::string m_getFunctionReportLine(size_t i, Function *f,
+                                      const TimeUnits &units);
   std::string m_getCurrentStack();
   std::string m_getCurrentFunction();
   void sortFunctions(const SortType &st, const SortOrder &so);
@@ -95,6 +100,8 @@ class Stack {
                     const Stack::SortOrder &so);
   std::vector<std::string> generateTimingReport(const SortType &st,
                                                 const SortOrder &so);
+  void m_setReportUnits(const Stack::TimeUnits &units);
+  std::string m_unitsString(const Stack::TimeUnits &units);
 
   void writeHeader();
   void writeFooter();

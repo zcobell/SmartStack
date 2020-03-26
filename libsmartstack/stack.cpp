@@ -54,7 +54,10 @@ bool sortFunctionMeanTimeAscending(const std::unique_ptr<Function> &a,
   return a.get()->meanDuration() < b.get()->meanDuration();
 }
 
-Stack::Stack() : m_started(false), m_firstProfile(true) {
+Stack::Stack()
+    : m_started(false),
+      m_firstProfile(true),
+      m_reportUnits(TimeUnits::Microseconds) {
   this->m_functionStack.reserve(5000);
   this->m_functions.reserve(5000);
   this->m_functionLookup.reserve(5000);
@@ -115,6 +118,10 @@ void Stack::saveTimingReport(const std::string &filename,
 }
 
 bool Stack::sessionStarted() { return Stack::get().m_sessionStarted(); }
+
+void Stack::setReportUnits(const Stack::TimeUnits &units) {
+  Stack::get().m_setReportUnits(units);
+}
 
 bool Stack::m_sessionStarted() { return this->m_started; }
 
@@ -260,38 +267,51 @@ std::vector<std::string> Stack::generateTimingReport(const SortType &st,
   this->sortFunctions(st, so);
   std::string callCode, durationCode, meanDurationCode;
   this->getSortCodes(callCode, durationCode, meanDurationCode, st, so);
+  std::string unit = this->m_unitsString(this->m_reportUnits);
 
   std::vector<std::string> table;
   table.push_back("Function report for: " + this->m_sessionName);
   table.push_back(
       "|----------|--------------------------------|-------------|-------------"
-      "-------|-----------------------|");
+      "-------|-------------------------|");
   table.push_back("|   Rank   |         Function Name          | " + callCode +
-                  " Calls   |  " + durationCode + " Duration (s)  | " +
-                  meanDurationCode + " Mean Duration (s) |");
+                  " Calls   |  " + durationCode + " Duration " + unit +
+                  " | " + meanDurationCode + "  Mean Duration " + unit +
+                  " |");
   table.push_back(
       "|----------|--------------------------------|-------------|-------------"
-      "-------|-----------------------|");
+      "-------|-------------------------|");
 
   size_t i = 0;
   for (auto &f : this->m_functions) {
     i++;
-    long long t = f->timer()->elapsed() / 1e6;
-    double ts = static_cast<double>(t) +
-                static_cast<double>(f->timer()->elapsed() - t) / 1e6;
-    long long mt = f->meanDuration() / 1e6;
-    double mts = static_cast<double>(mt) +
-                 static_cast<double>(f->meanDuration() - mt) / 1e6;
-    char line[200];
-    snprintf(line, 200,
-             "| %8zu | %30s | %11lld |       %6.6e |          %6.6e |", i,
-             f->name().c_str(), f->numCalls(), ts, mts);
+    std::string line =
+        this->m_getFunctionReportLine(i, f.get(), this->m_reportUnits);
     table.push_back(line);
   }
   table.push_back(
       "|----------|--------------------------------|-------------|-------------"
-      "-------|-----------------------|");
+      "-------|-------------------------|");
   return table;
+}
+
+void Stack::m_setReportUnits(const Stack::TimeUnits &units) {
+  this->m_reportUnits = units;
+}
+
+std::string Stack::m_unitsString(const Stack::TimeUnits &units) {
+  switch (units) {
+    case Microseconds:
+      return "(us)";
+    case Milliseconds:
+      return "(ms)";
+    case Seconds:
+      return "(s) ";
+    case Minutes:
+      return "(m) ";
+    case Hours:
+      return "(h) ";
+  }
 }
 
 void Stack::m_printTimingReport(const std::vector<std::string> &report) {
@@ -309,4 +329,42 @@ void Stack::m_saveTimimgReport(const std::vector<std::string> &report,
   }
   output.close();
   return;
+}
+
+std::string Stack::m_getFunctionReportLine(size_t i, Function *f,
+                                           const Stack::TimeUnits &units) {
+  char line[400];
+  if (units == Seconds || units == Hours || units == Minutes ||
+      units == Milliseconds) {
+    double multiplier = 1.0;
+    switch (units) {
+      case Seconds:
+        multiplier = 1e6;
+        break;
+      case Minutes:
+        multiplier = 1e6 * 60.0;
+        break;
+      case Hours:
+        multiplier = 1e6 * 60.0 * 60.0;
+        break;
+      case Milliseconds:
+        multiplier = 1000.0;
+        break;
+    }
+
+    long long t = f->timer()->elapsed() / multiplier;
+    double ts = static_cast<double>(t) +
+                static_cast<double>(f->timer()->elapsed() - t) / multiplier;
+    long long mt = f->meanDuration() / multiplier;
+    double mts = static_cast<double>(mt) +
+                 static_cast<double>(f->meanDuration() - mt) / multiplier;
+    snprintf(line, 400,
+             "| %8zu | %30s | %11lld |      %7.7e |           %7.7e |", i,
+             f->name().c_str(), f->numCalls(), ts, mts);
+  } else {
+    snprintf(line, 400, "| %8zu | %30s | %11lld |   %16lld |        %16lld |",
+             i, f->name().c_str(), f->numCalls(), f->timer()->elapsed(),
+             f->meanDuration());
+  }
+  return std::string(line);
 }

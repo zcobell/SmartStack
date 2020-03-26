@@ -6,9 +6,16 @@
             
             INTEGER,PARAMETER :: SMARTSTACK_SORTASCENDING = 10000
             INTEGER,PARAMETER :: SMARTSTACK_SORTDECENDING = 10001
+
             INTEGER,PARAMETER :: SMARTSTACK_SORTTIME      = 20000
             INTEGER,PARAMETER :: SMARTSTACK_SORTMEANTIME  = 20001
             INTEGER,PARAMETER :: SMARTSTACK_SORTCALLS     = 20002
+
+            INTEGER,PARAMETER :: SMARTSTACK_MICROSECONDS  = 30000
+            INTEGER,PARAMETER :: SMARTSTACK_MILLISECONDS  = 30001
+            INTEGER,PARAMETER :: SMARTSTACK_SECONDS       = 30002
+            INTEGER,PARAMETER :: SMARTSTACK_MINUTES       = 30003
+            INTEGER,PARAMETER :: SMARTSTACK_HOURS         = 30004
 
             TYPE SMARTSTACK
                 LOGICAL,PUBLIC      :: initialize = .TRUE.
@@ -97,6 +104,13 @@
                 SUBROUTINE c_getCurrentFunction() BIND(C,NAME="getCurrentFunctionFtn")
                     IMPLICIT NONE
                 END SUBROUTINE c_getCurrentFunction
+
+                SUBROUTINE c_setReportUnits(unitType) BIND(C,NAME="setReportUnitsFtn")
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT
+                    IMPLICIT NONE
+                    INTEGER(KIND=C_INT),INTENT(IN),VALUE :: unitType
+                END SUBROUTINE c_setReportUnits
+
 
             END INTERFACE
 
@@ -253,5 +267,11 @@
                     ENDIF
                     CALL c_saveTimingReport(FILENAME//C_NULL_CHAR,F_SORT_TYPE,F_SORT_ORDER)
                 END SUBROUTINE SmartStack_saveTimingReport
+
+                SUBROUTINE SmartStack_setReportUnits(unitType)
+                    IMPLICIT NONE
+                    INTEGER,INTENT(IN) :: unitType
+                    CALL c_setReportUnits(unitType)
+                END SUBROUTINE SmartStack_setReportUnits
 
         END MODULE SMARTSTACKMODULE

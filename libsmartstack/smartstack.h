@@ -40,6 +40,10 @@ void SMARTSTACK_EXPORT startSession(const std::string &sessionName) {
   SmartStack::Stack::startSession(sessionName);
 }
 
+void SMARTSTACK_EXPORT setReportUnits(const Stack::TimeUnits &units) {
+  SmartStack::Stack::setReportUnits(units);
+}
+
 void SMARTSTACK_EXPORT endSession() { SmartStack::Stack::endSession(); }
 
 void SMARTSTACK_EXPORT printStack(const std::string &message = std::string()) {
