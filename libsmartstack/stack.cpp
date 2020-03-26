@@ -272,15 +272,15 @@ std::vector<std::string> Stack::generateTimingReport(const SortType &st,
   std::vector<std::string> table;
   table.push_back("Function report for: " + this->m_sessionName);
   table.push_back(
-      "|----------|--------------------------------|-------------|-------------"
-      "-------|-------------------------|");
-  table.push_back("|   Rank   |         Function Name          | " + callCode +
-                  " Calls   |  " + durationCode + " Duration " + unit +
+      "|----------|----------------------------------------------------|-------------|-------------"
+      "---------|-------------------------|");
+  table.push_back("|   Rank   |                   Function Name                    | " + callCode +
+                  " Calls   |  " + durationCode + "  Duration  " + unit +
                   " | " + meanDurationCode + "  Mean Duration " + unit +
                   " |");
   table.push_back(
-      "|----------|--------------------------------|-------------|-------------"
-      "-------|-------------------------|");
+      "|----------|----------------------------------------------------|-------------|-------------"
+      "---------|-------------------------|");
 
   size_t i = 0;
   for (auto &f : this->m_functions) {
@@ -290,8 +290,8 @@ std::vector<std::string> Stack::generateTimingReport(const SortType &st,
     table.push_back(line);
   }
   table.push_back(
-      "|----------|--------------------------------|-------------|-------------"
-      "-------|-------------------------|");
+      "|----------|----------------------------------------------------|-------------|-------------"
+      "---------|-------------------------|");
   return table;
 }
 
@@ -350,6 +350,9 @@ std::string Stack::m_getFunctionReportLine(size_t i, Function *f,
       case Milliseconds:
         multiplier = 1000.0;
         break;
+      default:
+        multiplier = 1.0;
+        break;
     }
 
     long long t = f->timer()->elapsed() / multiplier;
@@ -359,10 +362,10 @@ std::string Stack::m_getFunctionReportLine(size_t i, Function *f,
     double mts = static_cast<double>(mt) +
                  static_cast<double>(f->meanDuration() - mt) / multiplier;
     snprintf(line, 400,
-             "| %8zu | %30s | %11lld |      %7.7e |           %7.7e |", i,
+             "| %8zu | %50s | %11lld |      %9.9e |           %9.9e |", i,
              f->name().c_str(), f->numCalls(), ts, mts);
   } else {
-    snprintf(line, 400, "| %8zu | %30s | %11lld |   %16lld |        %16lld |",
+    snprintf(line, 400, "| %8zu | %50s | %11lld |   %18lld |      %18lld |",
              i, f->name().c_str(), f->numCalls(), f->timer()->elapsed(),
              f->meanDuration());
   }
