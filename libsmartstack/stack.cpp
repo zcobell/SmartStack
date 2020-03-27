@@ -18,6 +18,8 @@
 //------------------------------------------------------------------------//
 #include "stack.h"
 
+#include <stdio.h>
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -55,8 +57,12 @@ bool sortFunctionMeanTimeAscending(const std::unique_ptr<Function> &a,
 }
 
 Stack::Stack()
-    : m_started(false),
+    : m_procid(-1),
+      m_logfile(std::string()),
+      m_procString(std::string()),
+      m_started(false),
       m_firstProfile(true),
+      m_logToFile(false),
       m_reportUnits(TimeUnits::Microseconds) {
   this->m_functionStack.reserve(5000);
   this->m_functions.reserve(5000);
@@ -65,8 +71,9 @@ Stack::Stack()
 
 Stack::~Stack() { this->m_endSession(); }
 
-void Stack::startSession(const std::string &session) {
-  Stack::get().m_startSession(session);
+void Stack::startSession(const std::string &session, const int &procid,
+                         const std::string &logfile) {
+  Stack::get().m_startSession(session, procid, logfile);
 }
 
 void Stack::endSession() { Stack::get().m_endSession(); }
@@ -125,9 +132,30 @@ void Stack::setReportUnits(const Stack::TimeUnits &units) {
 
 bool Stack::m_sessionStarted() { return this->m_started; }
 
-void Stack::m_startSession(const std::string &session) {
+void Stack::m_startSession(const std::string &session, int procid,
+                           const std::string &logfile) {
   this->m_sessionName = session;
   this->m_started = true;
+  this->m_procid = procid;
+
+  if (this->m_procid != -1) {
+    char ps[20];
+    snprintf(ps, 20, "Processor %6.6d", this->m_procid);
+    this->m_procString = std::string(ps);
+  } else {
+    this->m_procString = "";
+  }
+  if (logfile != std::string()) {
+    this->m_logToFile = true;
+    this->m_logfile = logfile;
+    std::ifstream f(this->m_logfile);
+    if (f.good()) {
+      remove(this->m_logfile.c_str());
+    }
+  } else {
+    this->m_logToFile = false;
+    this->m_logfile = std::string();
+  }
 }
 
 void Stack::m_endSession() {
@@ -179,24 +207,53 @@ void Stack::m_endFunction() {
 }
 
 void Stack::m_printCurrentStack(const std::string &message) {
-  if (message != std::string()) {
-    std::cout << this->m_getCurrentStack() << ": " << message << std::endl;
+  if (this->m_logToFile) {
+    std::ofstream f;
+    f.open(this->m_logfile, std::ios::out | std::ios::app);
+    if (message != std::string()) {
+      f << this->m_getCurrentStack() << ": " << message << std::endl;
+    } else {
+      f << this->m_getCurrentStack() << std::endl;
+    }
+    f.flush();
+    f.close();
   } else {
-    std::cout << this->m_getCurrentStack() << std::endl;
+    if (message != std::string()) {
+      std::cout << this->m_getCurrentStack() << ": " << message << std::endl;
+    } else {
+      std::cout << this->m_getCurrentStack() << std::endl;
+    }
   }
 }
 
 void Stack::m_printCurrentFunction(const std::string &message) {
-  if (message != std::string()) {
-    std::cout << this->m_getCurrentFunction() << ": " << message << std::endl;
+  if (this->m_logToFile) {
+    std::ofstream f;
+    f.open(this->m_logfile, std::ios::out | std::ios::app);
+    if (message != std::string()) {
+      f << this->m_getCurrentFunction() << ": " << message << std::endl;
+    } else {
+      f << this->m_getCurrentFunction() << std::endl;
+    }
+    f.flush();
+    f.close();
   } else {
-    std::cout << this->m_getCurrentFunction() << std::endl;
+    if (message != std::string()) {
+      std::cout << this->m_getCurrentFunction() << ": " << message << std::endl;
+    } else {
+      std::cout << this->m_getCurrentFunction() << std::endl;
+    }
   }
 }
 
 std::string Stack::m_getCurrentStack() {
   bool first = true;
-  std::string s = "[Stack " + this->m_sessionName + "]: ";
+  std::string s;
+  if (this->m_procid == -1) {
+    s = "[" + this->m_sessionName + "]: ";
+  } else {
+    s = "[" + this->m_sessionName + " " + this->m_procString + "]: ";
+  }
   for (const auto &f : this->m_functionStack) {
     if (!first) {
       s += " --> " + f->name();
@@ -209,8 +266,13 @@ std::string Stack::m_getCurrentStack() {
 }
 
 std::string Stack::m_getCurrentFunction() {
-  return "[Stack " + this->m_sessionName +
-         "]: " + this->m_functionStack.back()->name();
+  if (this->m_procid == -1) {
+    return "[" + this->m_sessionName +
+           "]: " + this->m_functionStack.back()->name();
+  } else {
+    return "[" + this->m_sessionName + " " + this->m_procString +
+           "]: " + this->m_functionStack.back()->name();
+  }
 }
 
 void Stack::sortFunctions(const SortType &st, const SortOrder &so) {
@@ -362,7 +424,7 @@ std::string Stack::m_getFunctionReportLine(size_t i, Function *f,
     double mts = static_cast<double>(mt) +
                  static_cast<double>(f->meanDuration() - mt) / multiplier;
     snprintf(line, 400,
-             "| %8zu | %50s | %11lld |      %9.9e |           %9.9e |", i,
+             "| %8zu | %50s | %11lld |      %9.9e |         %9.9e |", i,
              f->name().c_str(), f->numCalls(), ts, mts);
   } else {
     snprintf(line, 400, "| %8zu | %50s | %11lld |   %18lld |      %18lld |",

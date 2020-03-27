@@ -233,7 +233,7 @@ ENDIF(APPLE)
 
 
 IF(SMARTSTACK_BUILD_TESTS)
-    SET(TEST_LIST ftn_testSmartStack.F90 cxx_testSmartStack.cpp )
+    SET(TEST_LIST ftn_testSmartStack.F90 ftn_testSmartStackParallel.F90 cxx_testSmartStack.cpp )
     FOREACH(TESTFILE ${TEST_LIST} ) 
         GET_FILENAME_COMPONENT( TESTNAME ${TESTFILE} NAME_WE )
         ADD_EXECUTABLE( ${TESTNAME} ${CMAKE_SOURCE_DIR}/tests/${TESTFILE} )

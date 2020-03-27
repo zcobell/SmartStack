@@ -36,8 +36,10 @@ bool SMARTSTACK_EXPORT sessionStarted() {
   return SmartStack::Stack::sessionStarted();
 }
 
-void SMARTSTACK_EXPORT startSession(const std::string &sessionName) {
-  SmartStack::Stack::startSession(sessionName);
+void SMARTSTACK_EXPORT
+startSession(const std::string &sessionName, const int &procid = -1,
+             const std::string &logfile = std::string()) {
+  SmartStack::Stack::startSession(sessionName, procid, logfile);
 }
 
 void SMARTSTACK_EXPORT setReportUnits(const Stack::TimeUnits &units) {

@@ -41,7 +41,9 @@ class Stack {
   enum SortType { Time, MeanTime, Calls };
   enum TimeUnits { Microseconds, Milliseconds, Seconds, Minutes, Hours };
 
-  static void SMARTSTACK_EXPORT startSession(const std::string &session);
+  static void SMARTSTACK_EXPORT
+  startSession(const std::string &session, const int &processorId = -1,
+               const std::string &logfile = std::string());
   static void SMARTSTACK_EXPORT endSession();
   static void SMARTSTACK_EXPORT startFunction(const std::string &functionName,
                                               bool showStack = false);
@@ -66,8 +68,12 @@ class Stack {
 #warning This library is being built in benchmarking mode. This is dangerous. You have been warned.
 #endif
 
+  int m_procid;
+  std::string m_logfile;
+  std::string m_procString;
   bool m_started;
   bool m_firstProfile;
+  bool m_logToFile;
   std::string m_sessionName;
   TimeUnits m_reportUnits;
 
@@ -81,7 +87,8 @@ class Stack {
 #endif
 
   bool m_sessionStarted();
-  void m_startSession(const std::string &session);
+  void m_startSession(const std::string &session, int procid = -1,
+                      const std::string &logfile = std::string());
   void m_endSession();
   void m_endFunction();
   void m_startFunction(const std::string &functionName);

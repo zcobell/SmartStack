@@ -50,11 +50,20 @@
                     TYPE(C_PTR),VALUE,INTENT(IN) :: ptr
                 END SUBROUTINE c_deleteSmartStack
 
-                SUBROUTINE c_startSession(session_name) BIND(C,NAME="startSessionFtn")
-                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR
+                SUBROUTINE c_startSession(session_name,processorId) BIND(C,NAME="startSessionFtn")
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_INT
                     IMPLICIT NONE
-                    CHARACTER(KIND=C_CHAR),INTENT(IN) :: session_name
+                    CHARACTER(KIND=C_CHAR),INTENT(IN)    :: session_name
+                    INTEGER(KIND=C_INT),VALUE,INTENT(IN) :: processorId 
                 END SUBROUTINE c_startSession
+                
+                SUBROUTINE c_startSessionLog(session_name,processorId,logFile) BIND(C,NAME="startSessionLogFtn")
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_INT
+                    IMPLICIT NONE
+                    CHARACTER(KIND=C_CHAR),INTENT(IN)    :: session_name
+                    CHARACTER(KIND=C_CHAR),INTENT(IN)    :: logFile
+                    INTEGER(KIND=C_INT),VALUE,INTENT(IN) :: processorId 
+                END SUBROUTINE c_startSessionLog
 
                 SUBROUTINE c_endSession() BIND(C,NAME="endSessionFtn")
                     IMPLICIT NONE
@@ -165,11 +174,23 @@
                     CALL c_deleteSmartStack(this%ptr)
                 END SUBROUTINE destructor
 
-                SUBROUTINE SmartStack_startSession(session_name)
-                    USE,INTRINSIC    :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_NULL_CHAR
+                SUBROUTINE SmartStack_startSession(session_name, processorId, logFile)
+                    USE,INTRINSIC                    :: ISO_C_BINDING,ONLY:C_NULL_CHAR
                     IMPLICIT NONE
-                    CHARACTER(*)     :: session_name
-                    CALL c_startSession(session_name//C_NULL_CHAR)
+                    CHARACTER(*),OPTIONAL,INTENT(IN)  :: session_name
+                    CHARACTER(*),OPTIONAL,INTENT(IN)  :: logFile
+                    INTEGER,OPTIONAL,INTENT(IN)       :: processorId
+                    INTEGER                           :: f_processorId
+                    IF(PRESENT(processorId))THEN
+                        f_processorId = processorId
+                    ELSE
+                        f_processorId = -1
+                    ENDIF
+                    IF(PRESENT(logFile))THEN
+                        CALL c_startSessionLog(session_name//C_NULL_CHAR,f_processorId,logFile//C_NULL_CHAR)
+                    ELSE
+                        CALL c_startSession(session_name//C_NULL_CHAR,f_processorId)
+                    ENDIF
                 END SUBROUTINE SmartStack_startSession
 
                 SUBROUTINE SmartStack_endSession()
