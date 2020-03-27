@@ -43,6 +43,7 @@ class Stack {
 
   static void SMARTSTACK_EXPORT
   startSession(const std::string &session, const int &processorId = -1,
+               const bool proc0ToScreen = false,
                const std::string &logfile = std::string());
   static void SMARTSTACK_EXPORT endSession();
   static void SMARTSTACK_EXPORT startFunction(const std::string &functionName,
@@ -74,6 +75,7 @@ class Stack {
   bool m_started;
   bool m_firstProfile;
   bool m_logToFile;
+  bool m_proc0toScreen;
   std::string m_sessionName;
   TimeUnits m_reportUnits;
 
@@ -88,6 +90,7 @@ class Stack {
 
   bool m_sessionStarted();
   void m_startSession(const std::string &session, int procid = -1,
+                      const bool proc0ToScreen = false,
                       const std::string &logfile = std::string());
   void m_endSession();
   void m_endFunction();
@@ -99,8 +102,8 @@ class Stack {
                           const std::string &filename);
   std::string m_getFunctionReportLine(size_t i, Function *f,
                                       const TimeUnits &units);
-  std::string m_getCurrentStack();
-  std::string m_getCurrentFunction();
+  std::string m_getCurrentStack(const std::string &message = std::string());
+  std::string m_getCurrentFunction(const std::string &message = std::string());
   void sortFunctions(const SortType &st, const SortOrder &so);
   void getSortCodes(std::string &calls, std::string &duration,
                     std::string &meanDuration, const Stack::SortType &st,

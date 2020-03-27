@@ -42,7 +42,7 @@
             IMPLICIT NONE
             TYPE(SMARTSTACK),ALLOCATABLE :: ss
 
-            CALL SmartStack_StartSession("TestSession",245,"proc256.log")
+            CALL SmartStack_StartSession("TestSession",245,.TRUE.,"proc256.log")
             ss = SmartStack("MAIN")
             ss%initialize = .TRUE.
 

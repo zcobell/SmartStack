@@ -72,8 +72,8 @@ Stack::Stack()
 Stack::~Stack() { this->m_endSession(); }
 
 void Stack::startSession(const std::string &session, const int &procid,
-                         const std::string &logfile) {
-  Stack::get().m_startSession(session, procid, logfile);
+                         const bool proc0ToScreen, const std::string &logfile) {
+  Stack::get().m_startSession(session, procid, proc0ToScreen, logfile);
 }
 
 void Stack::endSession() { Stack::get().m_endSession(); }
@@ -133,10 +133,12 @@ void Stack::setReportUnits(const Stack::TimeUnits &units) {
 bool Stack::m_sessionStarted() { return this->m_started; }
 
 void Stack::m_startSession(const std::string &session, int procid,
+                           const bool proc0ToScreen,
                            const std::string &logfile) {
   this->m_sessionName = session;
   this->m_started = true;
   this->m_procid = procid;
+  this->m_proc0toScreen = proc0ToScreen;
 
   if (this->m_procid != -1) {
     char ps[20];
@@ -210,19 +212,13 @@ void Stack::m_printCurrentStack(const std::string &message) {
   if (this->m_logToFile) {
     std::ofstream f;
     f.open(this->m_logfile, std::ios::out | std::ios::app);
-    if (message != std::string()) {
-      f << this->m_getCurrentStack() << ": " << message << std::endl;
-    } else {
-      f << this->m_getCurrentStack() << std::endl;
-    }
+    f << this->m_getCurrentStack(message) << std::endl;
     f.flush();
     f.close();
-  } else {
-    if (message != std::string()) {
-      std::cout << this->m_getCurrentStack() << ": " << message << std::endl;
-    } else {
-      std::cout << this->m_getCurrentStack() << std::endl;
-    }
+  }
+
+  if (this->m_procid < 0 || (this->m_procid == 0 && this->m_proc0toScreen)) {
+    std::cout << this->m_getCurrentStack(message) << std::endl;
   }
 }
 
@@ -230,23 +226,17 @@ void Stack::m_printCurrentFunction(const std::string &message) {
   if (this->m_logToFile) {
     std::ofstream f;
     f.open(this->m_logfile, std::ios::out | std::ios::app);
-    if (message != std::string()) {
-      f << this->m_getCurrentFunction() << ": " << message << std::endl;
-    } else {
-      f << this->m_getCurrentFunction() << std::endl;
-    }
+    f << this->m_getCurrentFunction(message) << std::endl;
     f.flush();
     f.close();
-  } else {
-    if (message != std::string()) {
-      std::cout << this->m_getCurrentFunction() << ": " << message << std::endl;
-    } else {
-      std::cout << this->m_getCurrentFunction() << std::endl;
-    }
+  }
+
+  if (this->m_procid < 0 || (this->m_procid == 0 && this->m_proc0toScreen)) {
+    std::cout << this->m_getCurrentFunction(message) << std::endl;
   }
 }
 
-std::string Stack::m_getCurrentStack() {
+std::string Stack::m_getCurrentStack(const std::string &message) {
   bool first = true;
   std::string s;
   if (this->m_procid == -1) {
@@ -262,10 +252,13 @@ std::string Stack::m_getCurrentStack() {
       first = false;
     }
   }
+  if (message != std::string()) {
+    s += ": " + message;
+  }
   return s;
 }
 
-std::string Stack::m_getCurrentFunction() {
+std::string Stack::m_getCurrentFunction(const std::string &message) {
   if (this->m_procid == -1) {
     return "[" + this->m_sessionName +
            "]: " + this->m_functionStack.back()->name();
@@ -334,14 +327,18 @@ std::vector<std::string> Stack::generateTimingReport(const SortType &st,
   std::vector<std::string> table;
   table.push_back("Function report for: " + this->m_sessionName);
   table.push_back(
-      "|----------|----------------------------------------------------|-------------|-------------"
+      "|----------|----------------------------------------------------|-----"
+      "--"
+      "------|-------------"
       "---------|-------------------------|");
-  table.push_back("|   Rank   |                   Function Name                    | " + callCode +
-                  " Calls   |  " + durationCode + "  Duration  " + unit +
-                  " | " + meanDurationCode + "  Mean Duration " + unit +
-                  " |");
   table.push_back(
-      "|----------|----------------------------------------------------|-------------|-------------"
+      "|   Rank   |                   Function Name                    | " +
+      callCode + " Calls   |  " + durationCode + "  Duration  " + unit + " | " +
+      meanDurationCode + "  Mean Duration " + unit + " |");
+  table.push_back(
+      "|----------|----------------------------------------------------|-----"
+      "--"
+      "------|-------------"
       "---------|-------------------------|");
 
   size_t i = 0;
@@ -352,7 +349,9 @@ std::vector<std::string> Stack::generateTimingReport(const SortType &st,
     table.push_back(line);
   }
   table.push_back(
-      "|----------|----------------------------------------------------|-------------|-------------"
+      "|----------|----------------------------------------------------|-----"
+      "--"
+      "------|-------------"
       "---------|-------------------------|");
   return table;
 }
@@ -423,12 +422,11 @@ std::string Stack::m_getFunctionReportLine(size_t i, Function *f,
     long long mt = f->meanDuration() / multiplier;
     double mts = static_cast<double>(mt) +
                  static_cast<double>(f->meanDuration() - mt) / multiplier;
-    snprintf(line, 400,
-             "| %8zu | %50s | %11lld |      %9.9e |         %9.9e |", i,
-             f->name().c_str(), f->numCalls(), ts, mts);
+    snprintf(line, 400, "| %8zu | %50s | %11lld |      %9.9e |         %9.9e |",
+             i, f->name().c_str(), f->numCalls(), ts, mts);
   } else {
-    snprintf(line, 400, "| %8zu | %50s | %11lld |   %18lld |      %18lld |",
-             i, f->name().c_str(), f->numCalls(), f->timer()->elapsed(),
+    snprintf(line, 400, "| %8zu | %50s | %11lld |   %18lld |      %18lld |", i,
+             f->name().c_str(), f->numCalls(), f->timer()->elapsed(),
              f->meanDuration());
   }
   return std::string(line);

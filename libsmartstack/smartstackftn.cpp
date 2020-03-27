@@ -24,8 +24,9 @@
 #include "smartstack.h"
 
 extern "C" {
-void startSessionFtn(char* sessionName, int procid);
-void startSessionLogFtn(char* sessionName, int procid, char* logfile);
+void startSessionFtn(char* sessionName, int procid, bool proc0ToScreen);
+void startSessionLogFtn(char* sessionName, int procid, bool proc0ToScreen,
+                        char* logfile);
 void endSessionFtn();
 void* addSmartStackShowFtn(char* functionName);
 void* addSmartStackFtn(char* functionName);
@@ -57,12 +58,13 @@ constexpr std::array<SmartStack::Stack::TimeUnits, 5> c_unitsList = {
     SmartStack::Stack::Seconds, SmartStack::Stack::Minutes,
     SmartStack::Stack::Hours};
 
-void startSessionFtn(char* sessionName, int procid) {
-  SmartStack::startSession(sessionName, procid);
+void startSessionFtn(char* sessionName, int procid, bool proc0ToScreen) {
+  SmartStack::startSession(sessionName, procid, proc0ToScreen);
 }
 
-void startSessionLogFtn(char* sessionName, int procid, char* logfile) {
-  SmartStack::startSession(sessionName, procid, logfile);
+void startSessionLogFtn(char* sessionName, int procid, bool proc0ToScreen,
+                        char* logfile) {
+  SmartStack::startSession(sessionName, procid, proc0ToScreen, logfile);
 }
 
 void endSessionFtn() { SmartStack::endSession(); }
