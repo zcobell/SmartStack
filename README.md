@@ -9,20 +9,19 @@ A simple stack tracing and timing library for C++ and Fortran
 SmartStack is meant to provide an easy way to generate tracing and timing information from C++ and Fortran code bases with minimal overhead.
 
 ## Example Report
-Example report that can be generated. Sorted descending by number of function calls. Reports can be sorted by number of calls, duration, or mean duration in either ascending or descending direction by providing arguments to the reporting functions. 
-```
-Function report for: TestSession
-|----------|--------------------------------|-------------|--------------------|-----------------------|
-|   Rank   |         Function Name          | [^] Calls   |  [-] Duration (s)  | [-] Mean Duration (s) |
-|----------|--------------------------------|-------------|--------------------|-----------------------|
-|        1 |                           main |           1 |       0.000000e+00 |          0.000000e+00 |
-|        2 |                         Smart1 |           2 |       3.300000e-05 |          1.600000e-05 |
-|        3 |                         Smart2 |           5 |       6.000000e-06 |          1.000000e-06 |
-|----------|--------------------------------|-------------|--------------------|-----------------------|
-```
+Example report that can be generated. Sorted descending by number of function calls. Reports can be sorted by number of calls, duration, or mean duration in either ascending or descending direction by providing arguments to the reporting functions.
+
+
+|   Rank   | Function Name | [-] Calls   |  [v]  Local Duration  (us) | [-]  Mean Local Duration (us) |  [-] Local + Child Duration (us) | [-] Mean Local + Child Duration (us) |
+|----------|---------------|-------------|----------------------------|-------------------------------|----------------------------------|--------------------------------------|
+|        1 |        Smart2 |           3 |                        922 |                           307 |                              922 |                                  307 |
+|        2 |        Smart1 |           2 |                        724 |                           362 |                             1470 |                                  735 |
+|        3 |          MAIN |           1 |                          9 |                             9 |                             1672 |                                 1672 |
+
+
 
 ### Example Tracing
-Tracing can be done at any point in the code using the tracing function to generate output like below. 
+Tracing can be done at any point in the code using the tracing function to generate output like below.
 ```
 [Stack MySession]: main --> Smart1
 [Stack MySession]: main --> Smart1 --> Smart2
@@ -47,11 +46,11 @@ Entry and exit tracing can be done by specifying the boolean variable to show th
 ```
 
 ## Benchmarking
-Benchmarking is conducted using the Google Benchmark library. The benchmark looks at toggling the timer for a random function that already exists in the stack, the same function continuously that already exists, and a function that is newly created on a stack. It is expected that the former is the most likely case. 
+Benchmarking is conducted using the Google Benchmark library. The benchmark looks at toggling the timer for a random function that already exists in the stack, the same function continuously that already exists, and a function that is newly created on a stack. It is expected that the former is the most likely case.
 
-The relevant tests below are `bench_lookupRandomExistingFunction`, `bench_lookupSameExistingFunction` and `bench_lookupNewFunction`. The random lookup is has a performance of approximately 12.6 million/second for a random function and 14.3 million/second for the same function continuously. Creating a new function has a performance off about 1.6 million/second. 
+The relevant tests below are `bench_lookupRandomExistingFunction`, `bench_lookupSameExistingFunction` and `bench_lookupNewFunction`. The random lookup is has a performance of approximately 12.6 million/second for a random function and 14.3 million/second for the same function continuously. Creating a new function has a performance off about 1.6 million/second.
 
-The below tests are conducted using the GNU compiler version 9.2.1 and Abseil tables enabled. 
+The below tests are conducted using the GNU compiler version 9.2.1 and Abseil tables enabled.
 ```
 2020-03-25 13:56:28
 Running ./smartstack_benchmark
