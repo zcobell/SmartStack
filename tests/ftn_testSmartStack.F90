@@ -10,7 +10,7 @@
                 TYPE(SMARTSTACK),ALLOCATABLE :: ss
                 CHARACTER(200) :: fn
                 CHARACTER(10)  :: fn2
-                ss = SmartStack("Smart1",.TRUE.)
+                ss = SmartStack("Smart1_AVeryLongFunctionName",.TRUE.)
                 ss%initialize = .TRUE.
                 CALL SmartStack_getCurrentFunction(fn)
                 WRITE(*,'(2A)') "Manually getting current function name: ",TRIM(fn)

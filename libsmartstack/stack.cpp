@@ -390,8 +390,11 @@ std::vector<std::string> Stack::generateTableTimingReport(const SortType &st,
 
   size_t padsize = (this->maxNumFunctionChars(13) - 13) / 2;
   std::string pad = std::string(padsize + 1, ' ');
-  std::string dashfn = std::string(2 * padsize + 15, '-');
-  std::string fn = pad + "Function Name" + pad;
+
+  size_t dashpadlen = 0;
+  std::string dashfn;
+  dashfn = std::string(2 * padsize + 16, '-');
+  std::string fn = pad + " Function Name" + pad;
   std::string headerbar =
       "|----------|" + dashfn +
       "|-------------|----------------------------|----------------------------"
@@ -564,11 +567,15 @@ size_t Stack::maxNumFunctionChars(size_t lowerLimit) const {
   for (auto &f : this->m_functions) {
     mx = std::max(mx, f->name().size());
   }
-  return mx;
+  if (mx % 2 == 0) return mx;
+  return mx + 1;
 }
 
 std::string Stack::formatStringChar(size_t n) const {
   char line[20];
-  snprintf(line, 20, "%zu", n);
+  if (n == 13)
+    snprintf(line, 20, "%zu", n + 1);
+  else
+    snprintf(line, 20, "%zu", n);
   return std::string(line);
 }
