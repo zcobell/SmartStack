@@ -132,15 +132,23 @@ std::string Stack::getCurrentFunction() {
 }
 
 void Stack::printTimingReport(const SortType &st, const SortOrder &so) {
-  std::vector<std::string> report = Stack::get().generateTimingReport(st, so);
+  std::vector<std::string> report =
+      Stack::get().generateTableTimingReport(st, so);
   Stack::get().m_printTimingReport(report);
 }
 
 void Stack::saveTimingReport(const std::string &filename,
                              const Stack::SortType &st,
-                             const Stack::SortOrder &so) {
-  std::vector<std::string> report = Stack::get().generateTimingReport(st, so);
-  Stack::get().m_saveTimimgReport(report, filename);
+                             const Stack::SortOrder &so,
+                             const Stack::OutputFormat &of) {
+  if (of == Stack::OutputFormat::CSV) {
+    Stack::get().sortFunctions(st, so);
+    Stack::get().m_saveCsvTimingReport(filename);
+  } else {
+    std::vector<std::string> report =
+        Stack::get().generateTableTimingReport(st, so);
+    Stack::get().m_saveTableTimimgReport(report, filename);
+  }
   return;
 }
 
@@ -369,14 +377,14 @@ void Stack::getSortCodes(std::string &calls, std::string &duration,
   return;
 }
 
-std::vector<std::string> Stack::generateTimingReport(const SortType &st,
-                                                     const SortOrder &so) {
+std::vector<std::string> Stack::generateTableTimingReport(const SortType &st,
+                                                          const SortOrder &so) {
   this->sortFunctions(st, so);
   std::string callCode, durationCode, meanDurationCode, totalDurationCode,
       meanTotalDurationCode;
   this->getSortCodes(callCode, durationCode, meanDurationCode,
                      totalDurationCode, meanTotalDurationCode, st, so);
-  std::string unit = this->m_unitsString(this->m_reportUnits);
+  std::string unit = this->m_unitsString(this->m_reportUnits, false);
 
   std::vector<std::string> table;
 
@@ -403,8 +411,8 @@ std::vector<std::string> Stack::generateTimingReport(const SortType &st,
   size_t i = 0;
   for (auto &f : this->m_functions) {
     i++;
-    std::string line =
-        this->m_getFunctionReportLine(i, f.get(), this->m_reportUnits);
+    std::string line = this->m_getFunctionReportLine(
+        i, f.get(), this->m_reportUnits, Stack::Table);
     table.push_back(line);
   }
   table.push_back(headerbar);
@@ -415,19 +423,36 @@ void Stack::m_setReportUnits(const Stack::TimeUnits &units) {
   this->m_reportUnits = units;
 }
 
-std::string Stack::m_unitsString(const Stack::TimeUnits &units) const {
-  switch (units) {
-    case Microseconds:
-      return "(us)";
-    case Milliseconds:
-      return "(ms)";
-    case Seconds:
-      return "(s) ";
-    case Minutes:
-      return "(m) ";
-    case Hours:
-      return "(h) ";
+std::string Stack::m_unitsString(const Stack::TimeUnits &units,
+                                 bool trim) const {
+  if (!trim) {
+    switch (units) {
+      case Microseconds:
+        return "(us)";
+      case Milliseconds:
+        return "(ms)";
+      case Seconds:
+        return "(s) ";
+      case Minutes:
+        return "(m) ";
+      case Hours:
+        return "(h) ";
+    }
+  } else {
+    switch (units) {
+      case Microseconds:
+        return "_us";
+      case Milliseconds:
+        return "_ms";
+      case Seconds:
+        return "_s";
+      case Minutes:
+        return "_m";
+      case Hours:
+        return "_h";
+    }
   }
+  return "?";
 }
 
 void Stack::m_printTimingReport(const std::vector<std::string> &report) const {
@@ -437,8 +462,23 @@ void Stack::m_printTimingReport(const std::vector<std::string> &report) const {
   return;
 }
 
-void Stack::m_saveTimimgReport(const std::vector<std::string> &report,
-                               const std::string &filename) const {
+void Stack::m_saveCsvTimingReport(const std::string &filename) {
+  std::ofstream f(filename);
+  Stack::TimeUnits u = this->m_reportUnits;
+  std::string unit = this->m_unitsString(this->m_reportUnits, true);
+  f << "Rank,Function,NumCalls,LocalTime" + unit + ",MeanLocalTime" + unit +
+           ",LocalAndChildTime" + unit + "," + "MeanLocalAndChildTime" + unit
+    << std::endl;
+  size_t i = 0;
+  for (auto &fn : this->m_functions) {
+    i += 1;
+    f << this->m_getFunctionReportLine(i, fn.get(), u, Stack::CSV) << std::endl;
+  }
+  f.close();
+}
+
+void Stack::m_saveTableTimimgReport(const std::vector<std::string> &report,
+                                    const std::string &filename) const {
   std::ofstream output(filename);
   for (auto &s : report) {
     output << s << std::endl;
@@ -448,7 +488,8 @@ void Stack::m_saveTimimgReport(const std::vector<std::string> &report,
 }
 
 std::string Stack::m_getFunctionReportLine(
-    size_t i, Function *f, const Stack::TimeUnits &units) const {
+    size_t i, Function *f, const Stack::TimeUnits &units,
+    const Stack::OutputFormat &format) const {
   char line[400];
   if (units == Seconds || units == Hours || units == Minutes ||
       units == Milliseconds) {
@@ -478,24 +519,36 @@ std::string Stack::m_getFunctionReportLine(
     double amts =
         this->convertTimeUnitsDouble(f->meanGlobalDuration(), multiplier);
 
-    size_t fnnamemx = this->maxNumFunctionChars(13);
-    std::string formatLine =
-        std::string() + "| %8zu | %" + formatStringChar(fnnamemx) +
-        "s | %11lld |            %9.9e |               %9.9e |       "
-        "           %9.9e |                      %9.9e |";
+    if (format == Stack::Table) {
+      size_t fnnamemx = this->maxNumFunctionChars(13);
+      std::string formatLine =
+          std::string() + "| %8zu | %" + formatStringChar(fnnamemx) +
+          "s | %11lld |            %9.9e |               %9.9e |       "
+          "           %9.9e |                      %9.9e |";
 
-    snprintf(line, 400, formatLine.c_str(), i, f->name().c_str(), f->numCalls(),
-             ts, mts, ats, amts);
+      snprintf(line, 400, formatLine.c_str(), i, f->name().c_str(),
+               f->numCalls(), ts, mts, ats, amts);
+    } else {
+      snprintf(line, 400, "%zu,%s,%lld,%9.9e,%9.9e,%9.9e,%9.9e", i,
+               f->name().c_str(), f->numCalls(), ts, mts, ats, amts);
+    }
   } else {
-    size_t fnnamemx = this->maxNumFunctionChars(13);
-    std::string formatLine = std::string() + "| %8zu | %" +
-                             formatStringChar(fnnamemx) +
-                             "s | %11lld |         %18lld |            %18lld "
-                             "|               %18lld |  "
-                             "                 %18lld |";
-    snprintf(line, 400, formatLine.c_str(), i, f->name().c_str(), f->numCalls(),
-             f->timer()->elapsed(), f->meanDuration(),
-             f->timer()->globalElapsed(), f->meanGlobalDuration());
+    if (format == Stack::Table) {
+      size_t fnnamemx = this->maxNumFunctionChars(13);
+      std::string formatLine =
+          std::string() + "| %8zu | %" + formatStringChar(fnnamemx) +
+          "s | %11lld |         %18lld |            %18lld "
+          "|               %18lld |  "
+          "                 %18lld |";
+      snprintf(line, 400, formatLine.c_str(), i, f->name().c_str(),
+               f->numCalls(), f->timer()->elapsed(), f->meanDuration(),
+               f->timer()->globalElapsed(), f->meanGlobalDuration());
+    } else {
+      snprintf(line, 400, "%zu,%s,%lld,%lld,%lld,%lld,%lld", i,
+               f->name().c_str(), f->numCalls(), f->timer()->elapsed(),
+               f->meanDuration(), f->timer()->globalElapsed(),
+               f->meanGlobalDuration());
+    }
   }
   return std::string(line);
 }

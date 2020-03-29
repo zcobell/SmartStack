@@ -16,6 +16,9 @@
             INTEGER,PARAMETER :: SMARTSTACK_SECONDS       = 30002
             INTEGER,PARAMETER :: SMARTSTACK_MINUTES       = 30003
             INTEGER,PARAMETER :: SMARTSTACK_HOURS         = 30004
+    
+            INTEGER,PARAMETER :: SMARTSTACK_TABLE         = 40000
+            INTEGER,PARAMETER :: SMARTSTACK_CSV           = 40001
 
             TYPE SMARTSTACK
                 LOGICAL,PUBLIC      :: initialize = .TRUE.
@@ -99,13 +102,14 @@
                     INTEGER(KIND=C_INT),VALUE :: SORT_ORDER
                 END SUBROUTINE c_printTimingReport
 
-                SUBROUTINE c_saveTimingReport(FILENAME,SORT_TYPE,SORT_ORDER) &
+                SUBROUTINE c_saveTimingReport(FILENAME,SORT_TYPE,SORT_ORDER,OUTPUT_FORMAT) &
                         BIND(C,NAME="saveTimingReportFtn")
                     USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_CHAR,C_INT
                     IMPLICIT NONE
                     CHARACTER(KIND=C_CHAR),INTENT(IN)    :: FILENAME
                     INTEGER(KIND=C_INT),INTENT(IN),VALUE :: SORT_TYPE
                     INTEGER(KIND=C_INT),INTENT(IN),VALUE :: SORT_ORDER
+                    INTEGER(KIND=C_INT),INTENT(IN),VALUE :: OUTPUT_FORMAT
                 END SUBROUTINE c_saveTimingReport
 
                 SUBROUTINE c_getCurrentStack() BIND(C,NAME="getCurrentStackFtn")
@@ -278,14 +282,16 @@
                     CALL c_printTimingReport(F_SORT_TYPE,F_SORT_ORDER)
                 END SUBROUTINE SmartStack_printTimingReport
 
-                SUBROUTINE SmartStack_saveTimingReport(FILENAME,SORT_TYPE,SORT_ORDER)
+                SUBROUTINE SmartStack_saveTimingReport(FILENAME,SORT_TYPE,SORT_ORDER,OUTPUT_FORMAT)
                     USE,INTRINSIC    :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_NULL_CHAR
                     IMPLICIT NONE
                     CHARACTER(*),INTENT(IN)     :: FILENAME
                     INTEGER,OPTIONAL,INTENT(IN) :: SORT_TYPE
                     INTEGER,OPTIONAL,INTENT(IN) :: SORT_ORDER
+                    INTEGER,OPTIONAL,INTENT(IN) :: OUTPUT_FORMAT
                     INTEGER                     :: F_SORT_TYPE
                     INTEGER                     :: F_SORT_ORDER
+                    INTEGER                     :: F_OUTPUT_FORMAT
                     IF(PRESENT(SORT_TYPE))THEN
                         F_SORT_TYPE = SORT_TYPE
                     ELSE
@@ -296,7 +302,12 @@
                     ELSE
                         F_SORT_ORDER = SMARTSTACK_SORTDECENDING
                     ENDIF
-                    CALL c_saveTimingReport(FILENAME//C_NULL_CHAR,F_SORT_TYPE,F_SORT_ORDER)
+                    IF(PRESENT(OUTPUT_FORMAT))THEN
+                        F_OUTPUT_FORMAT = OUTPUT_FORMAT
+                    ELSE
+                        F_OUTPUT_FORMAT = SMARTSTACK_TABLE
+                    ENDIF
+                    CALL c_saveTimingReport(FILENAME//C_NULL_CHAR,F_SORT_TYPE,F_SORT_ORDER,F_OUTPUT_FORMAT)
                 END SUBROUTINE SmartStack_saveTimingReport
 
                 SUBROUTINE SmartStack_setReportUnits(unitType)

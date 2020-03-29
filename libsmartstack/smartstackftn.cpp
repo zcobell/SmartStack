@@ -37,7 +37,7 @@ void printCurrentFunctionFtn();
 void printCurrentFunctionMessageFtn(const char* message);
 void printTimingReportFtn(int sortType = 20000, int sortOrder = 10001);
 void saveTimingReportFtn(char* filename, int sortType = 20000,
-                         int sortOrder = 10001);
+                         int sortOrder = 10001, int format = 40000);
 void getCurrentStackFtn();
 void getCurrentFunctionFtn();
 void setReportUnitsFtn(int units = 30000);
@@ -57,6 +57,9 @@ constexpr std::array<SmartStack::Stack::TimeUnits, 5> c_unitsList = {
     SmartStack::Stack::Microseconds, SmartStack::Stack::Milliseconds,
     SmartStack::Stack::Seconds, SmartStack::Stack::Minutes,
     SmartStack::Stack::Hours};
+
+constexpr std::array<SmartStack::Stack::OutputFormat, 2> c_outputFormat = {
+    SmartStack::Stack::Table, SmartStack::Stack::CSV};
 
 void startSessionFtn(char* sessionName, int procid, bool proc0ToScreen) {
   SmartStack::startSession(sessionName, procid, proc0ToScreen);
@@ -117,10 +120,13 @@ void printTimingReportFtn(int sortType, int sortOrder) {
   SmartStack::printTimingReport(c_sortType, c_sortOrder);
 }
 
-void saveTimingReportFtn(char* filename, int sortType, int sortOrder) {
+void saveTimingReportFtn(char* filename, int sortType, int sortOrder,
+                         int format) {
   SmartStack::Stack::SortType c_sortType = c_sortTypeList[sortType - 20000];
   SmartStack::Stack::SortOrder c_sortOrder = c_sortOrderList[sortOrder - 10000];
-  SmartStack::Stack::saveTimingReport(filename, c_sortType, c_sortOrder);
+  SmartStack::Stack::OutputFormat c_format = c_outputFormat[format - 40000];
+  SmartStack::Stack::saveTimingReport(filename, c_sortType, c_sortOrder,
+                                      c_format);
 }
 
 void setReportUnitsFtn(int units) {
