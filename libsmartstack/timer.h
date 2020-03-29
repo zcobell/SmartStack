@@ -28,7 +28,10 @@ class Timer {
   SMARTSTACK_EXPORT Timer();
   void SMARTSTACK_EXPORT startClock();
   void SMARTSTACK_EXPORT stopClock();
+  void SMARTSTACK_EXPORT pause();
+  void SMARTSTACK_EXPORT restart();
   long long SMARTSTACK_EXPORT elapsed() const;
+  long long SMARTSTACK_EXPORT globalElapsed() const;
   long long SMARTSTACK_EXPORT startTime() const;
   long long SMARTSTACK_EXPORT endTime() const;
   long long SMARTSTACK_EXPORT lastElapsed() const;
@@ -37,9 +40,12 @@ class Timer {
  private:
   long long m_totalElapsed;
   long long m_lastElapsed;
+  long long m_totalGlobalElapsed;
   bool m_running;
-  std::chrono::high_resolution_clock::time_point m_start;
-  std::chrono::high_resolution_clock::time_point m_end;
+  std::chrono::high_resolution_clock::time_point m_startLocal;
+  std::chrono::high_resolution_clock::time_point m_endLocal;
+  std::chrono::high_resolution_clock::time_point m_startGlobal;
+  std::chrono::high_resolution_clock::time_point m_endGlobal;
 };
 
 #endif  // TIMER_H

@@ -25,17 +25,21 @@ void Function::startFunction() {
   this->m_ncall++;
 }
 
-void Function::pauseFunction() { this->m_timer.stopClock(); }
+void Function::pauseFunction() { this->m_timer.pause(); }
 
-void Function::restartFunction() { this->m_timer.startClock(); }
+void Function::restartFunction() { this->m_timer.restart(); }
 
 long long Function::meanDuration() {
   return this->m_timer.elapsed() / this->m_ncall;
 }
 
+long long Function::meanGlobalDuration() {
+  return this->m_timer.globalElapsed() / this->m_ncall;
+}
+
 void Function::endFunction() { this->m_timer.stopClock(); }
 
-std::string Function::name() const { return m_name; }
+std::string Function::name() const { return this->m_name; }
 
 long long Function::numCalls() const { return this->m_ncall; }
 

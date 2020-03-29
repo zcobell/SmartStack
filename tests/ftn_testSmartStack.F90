@@ -50,6 +50,8 @@
             CALL SMART1()
             CALL SMART2()
 
+            CALL SmartStack_EndSession()
+
             CALL SmartStack_printTimingReport()
 
             CALL SmartStack_setReportUnits(SMARTSTACK_MILLISECONDS)

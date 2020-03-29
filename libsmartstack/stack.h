@@ -38,7 +38,7 @@ namespace SmartStack {
 class Stack {
  public:
   enum SortOrder { Ascending, Decending };
-  enum SortType { Time, MeanTime, Calls };
+  enum SortType { Time, MeanTime, TotalTime, MeanTotalTime, Calls };
   enum TimeUnits { Microseconds, Milliseconds, Seconds, Minutes, Hours };
 
   static void SMARTSTACK_EXPORT
@@ -95,23 +95,30 @@ class Stack {
   void m_endSession();
   void m_endFunction();
   void m_startFunction(const std::string &functionName);
-  void m_printCurrentFunction(const std::string &message = std::string());
-  void m_printCurrentStack(const std::string &message = std::string());
-  void m_printTimingReport(const std::vector<std::string> &report);
+  void m_printCurrentFunction(const std::string &message = std::string()) const;
+  void m_printCurrentStack(const std::string &message = std::string()) const;
+  void m_printTimingReport(const std::vector<std::string> &report) const;
   void m_saveTimimgReport(const std::vector<std::string> &report,
-                          const std::string &filename);
+                          const std::string &filename) const;
   std::string m_getFunctionReportLine(size_t i, Function *f,
-                                      const TimeUnits &units);
-  std::string m_getCurrentStack(const std::string &message = std::string());
-  std::string m_getCurrentFunction(const std::string &message = std::string());
+                                      const TimeUnits &units) const;
+  std::string m_getCurrentStack(
+      const std::string &message = std::string()) const;
+  std::string m_getCurrentFunction(
+      const std::string &message = std::string()) const;
   void sortFunctions(const SortType &st, const SortOrder &so);
   void getSortCodes(std::string &calls, std::string &duration,
-                    std::string &meanDuration, const Stack::SortType &st,
+                    std::string &meanDuration, std::string &totalDuration,
+                    std::string &meanTotalDuration, const SortType &st,
                     const Stack::SortOrder &so);
   std::vector<std::string> generateTimingReport(const SortType &st,
                                                 const SortOrder &so);
   void m_setReportUnits(const Stack::TimeUnits &units);
-  std::string m_unitsString(const Stack::TimeUnits &units);
+  std::string m_unitsString(const Stack::TimeUnits &units) const;
+  double convertTimeUnitsDouble(const long long time,
+                                const double multiplier) const;
+  size_t maxNumFunctionChars(size_t lowerLimit = 0) const;
+  std::string formatStringChar(size_t n) const;
 
   void writeHeader();
   void writeFooter();

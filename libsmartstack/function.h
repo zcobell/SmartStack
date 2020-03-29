@@ -35,6 +35,7 @@ class Function {
   void SMARTSTACK_EXPORT restartFunction();
 
   long long SMARTSTACK_EXPORT meanDuration();
+  long long SMARTSTACK_EXPORT meanGlobalDuration();
 
   Timer SMARTSTACK_EXPORT *timer();
 

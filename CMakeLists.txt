@@ -107,7 +107,6 @@ set(SMARTSTACK_VERSION_PATCH 0)
 set(SMARTSTACK_VERSION_STRING ${SMARTSTACK_VERSION_MAJOR}.${SMARTSTACK_VERSION_MINOR}.${SMARTSTACK_VERSION_PATCH})
 ###########################################################################
 
-OPTION( SMARTSTACK_AGGREGATE "Includes functions deeper in the stack in total time" OFF )
 OPTION( SMARTSTACK_BUILDSHARED "Build shared object version of SmartStack" OFF )
 IF( SMARTSTACK_BUILDSHARED )
     SET( SMARTSTACK_LIBTYPE SHARED )
@@ -143,7 +142,7 @@ ENDIF(SMARTSTACK_BUILD_BENCHMARK)
 # ABSEIL SWISS TABLES
 ###########################################################################
 IF(NOT CYGWIN)
-    OPTION(SMARTSTACK_USE_ABSEIL_FLAT_MAP "Use the Abseil Swiss Tables to increase speed" ON)
+    OPTION(SMARTSTACK_USE_ABSEIL_FLAT_MAP "Use the Abseil Swiss Tables to increase speed" OFF)
     IF(SMARTSTACK_USE_ABSEIL_FLAT_MAP)
         if(MSVC)
           # /wd4005  macro-redefinition
@@ -179,10 +178,6 @@ SET( SMARTSTACK_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/timer.cpp
 
 ADD_LIBRARY( smartstack ${SMARTSTACK_LIBTYPE} ${SMARTSTACK_SOURCES} )
 
-IF( SMARTSTACK_AGGREGATE )
-    TARGET_COMPILE_DEFINITIONS( smartstack PRIVATE "SMARTSTACK_AGGREGATE" )
-ENDIF( SMARTSTACK_AGGREGATE )
-    
 SET_TARGET_PROPERTIES( smartstack PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles/smartstack )
 
 SET(HEADER_LIST ${CMAKE_SOURCE_DIR}/libsmartstack/smartstack.h )

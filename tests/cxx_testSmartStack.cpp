@@ -33,7 +33,7 @@ int main(int argv, char** argc) {
   }
 
   END_SMARTSTACK();
-  SmartStack::printTimingReport();
+  SmartStack::printTimingReport(SmartStack::Stack::TotalTime,SmartStack::Stack::Ascending);
 
   return 0;
 }

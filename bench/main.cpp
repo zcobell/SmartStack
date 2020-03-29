@@ -26,10 +26,12 @@
 #include "smartstack.h"
 
 const size_t c_functionSize = 500;
+std::chrono::high_resolution_clock::time_point t_init;
 std::vector<std::string> functionList(c_functionSize);
 std::vector<int> intList(c_functionSize);
 
 void initializer() {
+  t_init = std::chrono::high_resolution_clock::now();
   SmartStack::Stack::startSession("Benchmark");
   SmartStack::Stack::startFunction("myfunction");
   SmartStack::Stack::endFunction();
@@ -118,6 +120,28 @@ static void bench_lookupNewFunction(benchmark::State& state) {
   state.SetItemsProcessed(state.iterations());
 }
 
+static void bench_startTimer(benchmark::State& state) {
+  while (state.KeepRunning()) {
+    benchmark::DoNotOptimize(std::chrono::high_resolution_clock::now());
+  }
+}
+
+static void bench_endTimerAndCount(benchmark::State& state) {
+  while (state.KeepRunning()) {
+    std::chrono::high_resolution_clock::time_point b =
+        std::chrono::high_resolution_clock::now();
+    benchmark::DoNotOptimize(
+        std::chrono::duration_cast<std::chrono::microseconds>(b - t_init)
+            .count());
+  }
+}
+
+static void bench_hashString(benchmark::State& state) {
+  while (state.KeepRunning()) {
+    benchmark::DoNotOptimize(std::hash<std::string>()("function_name"));
+  }
+}
+
 BENCHMARK(bench_lookupRandomExistingFunction);
 BENCHMARK(bench_lookupSameExistingFunction);
 BENCHMARK(bench_lookupNewFunction);
@@ -127,7 +151,9 @@ BENCHMARK(bench_compareInts);
 BENCHMARK(bench_getFunctionPointer);
 BENCHMARK(bench_getPointerAndStart);
 BENCHMARK(bench_createFunctionString);
-
+BENCHMARK(bench_startTimer);
+BENCHMARK(bench_endTimerAndCount);
+BENCHMARK(bench_hashString);
 
 int main(int argc, char** argv) {
   initializer();

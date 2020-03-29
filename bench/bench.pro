@@ -21,7 +21,7 @@ QT -= gui
 CONFIG += c++11 console benchmark
 CONFIG -= app_bundle
 
-GOOGLE_BENCH_HOME = /opt/google/benchmark
+GOOGLE_BENCH_HOME = /opt/google-benchmark
 
 INCLUDEPATH += $$GOOGLE_BENCH_HOME/include
 LIBS += -L$$GOOGLE_BENCH_HOME/lib -lbenchmark -pthread
