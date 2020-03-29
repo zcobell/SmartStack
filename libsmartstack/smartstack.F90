@@ -236,7 +236,6 @@
                 SUBROUTINE SmartStack_getCurrentStack(buffer) 
                     IMPLICIT NONE
                     CHARACTER(*),INTENT(OUT) :: buffer
-                    INTEGER                  :: I
                     CALL c_getCurrentStack()
                     IF(LEN(buffer).LT.LEN(c_string_buffer))THEN
                         WRITE(*,'(A)') "SmartStack Error: String buffer overflow detected."//&
@@ -251,7 +250,6 @@
                 SUBROUTINE SmartStack_getCurrentFunction(buffer) 
                     IMPLICIT NONE
                     CHARACTER(*),INTENT(OUT) :: buffer
-                    INTEGER                  :: I
                     CALL c_getCurrentFunction()
                     IF(LEN(buffer).LT.LEN(c_string_buffer))THEN
                         WRITE(*,'(A)') "SmartStack Error: String buffer overflow detected."//&
