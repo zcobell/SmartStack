@@ -45,14 +45,14 @@ void initializer() {
 }
 
 static void bench_vectorRandomLookup(benchmark::State &state) {
-  while (state.KeepRunning()) {
+  for (auto _ : state) {
     benchmark::DoNotOptimize(functionList[rand() % c_functionSize]);
   }
   state.SetItemsProcessed(state.iterations());
 }
 
 static void bench_compareStrings(benchmark::State &state) {
-  while (state.KeepRunning()) {
+  for (auto _ : state) {
     benchmark::DoNotOptimize(functionList[rand() % c_functionSize] ==
         functionList[rand() % c_functionSize]);
   }
@@ -60,7 +60,7 @@ static void bench_compareStrings(benchmark::State &state) {
 }
 
 static void bench_compareInts(benchmark::State &state) {
-  while (state.KeepRunning()) {
+  for (auto _ : state) {
     benchmark::DoNotOptimize(intList[rand() % c_functionSize] ==
         intList[rand() % c_functionSize]);
   }
@@ -68,7 +68,7 @@ static void bench_compareInts(benchmark::State &state) {
 }
 
 static void bench_getFunctionPointer(benchmark::State &state) {
-  while (state.KeepRunning()) {
+  for (auto _ : state) {
     benchmark::DoNotOptimize(SmartStack::Stack::get().getFunctionPointer(
         functionList[rand() % c_functionSize]));
   }
@@ -76,7 +76,7 @@ static void bench_getFunctionPointer(benchmark::State &state) {
 }
 
 static void bench_getPointerAndStart(benchmark::State &state) {
-  while (state.KeepRunning()) {
+  for (auto _ : state) {
     Function *f = SmartStack::Stack::get().getFunctionPointer(
         functionList[rand() % c_functionSize]);
     f->startFunction();
@@ -85,7 +85,7 @@ static void bench_getPointerAndStart(benchmark::State &state) {
 }
 
 static void bench_lookupRandomExistingFunction(benchmark::State &state) {
-  while (state.KeepRunning()) {
+  for (auto _ : state) {
     SmartStack::Stack::startFunction(functionList[rand() % c_functionSize]);
     SmartStack::Stack::endFunction();
   }
@@ -93,7 +93,7 @@ static void bench_lookupRandomExistingFunction(benchmark::State &state) {
 }
 
 static void bench_lookupSameExistingFunction(benchmark::State &state) {
-  while (state.KeepRunning()) {
+  for (auto _ : state) {
     SmartStack::Stack::startFunction("function_00010000");
     SmartStack::Stack::endFunction();
   }
@@ -102,7 +102,7 @@ static void bench_lookupSameExistingFunction(benchmark::State &state) {
 
 static void bench_createFunctionString(benchmark::State &state) {
   size_t i = 0;
-  while (state.KeepRunning()) {
+  for (auto _ : state) {
     i++;
     char fn[21];
     benchmark::DoNotOptimize(sprintf(fn, "newfunction_%8.8zu", i));
@@ -112,7 +112,7 @@ static void bench_createFunctionString(benchmark::State &state) {
 
 static void bench_lookupNewFunction(benchmark::State &state) {
   size_t i = 0;
-  while (state.KeepRunning()) {
+  for (auto _ : state) {
     i++;
     char fn[21];
     sprintf(fn, "newfunction_%8.8zu", i);
@@ -123,13 +123,13 @@ static void bench_lookupNewFunction(benchmark::State &state) {
 }
 
 static void bench_startTimer(benchmark::State &state) {
-  while (state.KeepRunning()) {
+  for (auto _ : state) {
     benchmark::DoNotOptimize(std::chrono::high_resolution_clock::now());
   }
 }
 
 static void bench_endTimerAndCount(benchmark::State &state) {
-  while (state.KeepRunning()) {
+  for (auto _ : state) {
     std::chrono::high_resolution_clock::time_point b =
         std::chrono::high_resolution_clock::now();
     benchmark::DoNotOptimize(
@@ -139,7 +139,7 @@ static void bench_endTimerAndCount(benchmark::State &state) {
 }
 
 static void bench_hashString(benchmark::State &state) {
-  while (state.KeepRunning()) {
+  for (auto _ : state) {
     benchmark::DoNotOptimize(std::hash<std::string>()("function_name"));
   }
 }

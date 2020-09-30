@@ -128,7 +128,7 @@ class Stack {
   Function *createFunction(const std::string &name);
   Function *getFunctionPointer(const std::string &name);
 
-  Stack();
+  Stack(size_t reserve = 0);
 
   ~Stack();
 

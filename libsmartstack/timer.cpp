@@ -35,8 +35,8 @@ void Timer::stopClock() {
     this->m_endLocal = std::chrono::high_resolution_clock::now();
     this->m_endGlobal = this->m_endLocal;
     this->m_lastElapsed = std::chrono::duration_cast<std::chrono::microseconds>(
-                              this->m_endLocal - this->m_startLocal)
-                              .count();
+        this->m_endLocal - this->m_startLocal)
+        .count();
     this->m_totalElapsed += this->m_lastElapsed;
     this->m_totalGlobalElapsed +=
         std::chrono::duration_cast<std::chrono::microseconds>(
@@ -50,8 +50,8 @@ void Timer::pause() {
   if (this->m_running) {
     this->m_endLocal = std::chrono::high_resolution_clock::now();
     this->m_lastElapsed = std::chrono::duration_cast<std::chrono::microseconds>(
-                              this->m_endLocal - this->m_startLocal)
-                              .count();
+        this->m_endLocal - this->m_startLocal)
+        .count();
     this->m_totalElapsed += this->m_lastElapsed;
   }
 }
@@ -66,14 +66,14 @@ long long Timer::globalElapsed() const { return this->m_totalGlobalElapsed; }
 
 long long Timer::startTime() const {
   return std::chrono::time_point_cast<std::chrono::milliseconds>(
-             this->m_startLocal)
+      this->m_startLocal)
       .time_since_epoch()
       .count();
 }
 
 long long Timer::endTime() const {
   return std::chrono::time_point_cast<std::chrono::milliseconds>(
-             this->m_endLocal)
+      this->m_endLocal)
       .time_since_epoch()
       .count();
 }

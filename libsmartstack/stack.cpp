@@ -80,7 +80,7 @@ bool sortFunctionTotalTimeDescending(const std::unique_ptr<Function> &a,
   return a->timer()->globalElapsed() > b->timer()->globalElapsed();
 }
 
-Stack::Stack()
+Stack::Stack(size_t reserve)
     : m_procid(-1),
       m_logfile(std::string()),
       m_procString(std::string()),
@@ -89,9 +89,11 @@ Stack::Stack()
       m_logToFile(false),
       m_proc0toScreen(false),
       m_reportUnits(TimeUnits::Microseconds) {
-  this->m_functionStack.reserve(5000);
-  this->m_functions.reserve(5000);
-  this->m_functionLookup.reserve(5000);
+  if (reserve > 0) {
+    this->m_functionStack.reserve(5000);
+    this->m_functions.reserve(5000);
+    this->m_functionLookup.reserve(5000);
+  }
 }
 
 Stack::~Stack() { this->m_endSession(); }
