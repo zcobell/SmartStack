@@ -299,40 +299,23 @@ std::string Stack::m_getCurrentFunction(const std::string &message) const {
 }
 
 void Stack::sortFunctions(const SortType &st, const SortOrder &so) {
-  if (st == Time && so == Ascending) {
-    std::sort(this->m_functions.begin(), this->m_functions.end(),
-              sortFunctionTimeAscending);
-  } else if (st == Time && so == Descending) {
-    std::sort(this->m_functions.begin(), this->m_functions.end(),
-              sortFunctionTimeDescending);
-  } else if (st == Calls && so == Ascending) {
-    std::sort(this->m_functions.begin(), this->m_functions.end(),
-              sortFunctionCallsAscending);
-  } else if (st == Calls && so == Descending) {
-    std::sort(this->m_functions.begin(), this->m_functions.end(),
-              sortFunctionCallsDescending);
-  } else if (st == MeanTime && so == Ascending) {
-    std::sort(this->m_functions.begin(), this->m_functions.end(),
-              sortFunctionMeanTimeAscending);
-  } else if (st == MeanTime && so == Descending) {
-    std::sort(this->m_functions.begin(), this->m_functions.end(),
-              sortFunctionMeanTimeDescending);
-  } else if (st == MeanTotalTime && so == Descending) {
-    std::sort(this->m_functions.begin(), this->m_functions.end(),
-              sortFunctionMeanTotalTimeDescending);
-  } else if (st == MeanTotalTime && so == Ascending) {
-    std::sort(this->m_functions.begin(), this->m_functions.end(),
-              sortFunctionMeanTotalTimeAscending);
-  } else if (st == TotalTime && so == Descending) {
-    std::sort(this->m_functions.begin(), this->m_functions.end(),
-              sortFunctionTotalTimeDescending);
-  } else if (st == TotalTime && so == Ascending) {
-    std::sort(this->m_functions.begin(), this->m_functions.end(),
-              sortFunctionTotalTimeAscending);
-  } else {
-    std::sort(this->m_functions.begin(), this->m_functions.end(),
-              sortFunctionTimeDescending);
+  bool (*sortPtr)(const std::unique_ptr<Function> &, const std::unique_ptr<Function> &);
+  switch (st) {
+    case Time: so == Ascending ? sortPtr = sortFunctionTimeAscending : sortPtr = sortFunctionTimeDescending;
+      break;
+    case Calls:so == Ascending ? sortPtr = sortFunctionCallsAscending : sortPtr = sortFunctionCallsDescending;
+      break;
+    case MeanTime: so == Ascending ? sortPtr = sortFunctionMeanTimeAscending : sortPtr = sortFunctionMeanTimeDescending;
+      break;
+    case MeanTotalTime:
+      so == Ascending ? sortPtr = sortFunctionMeanTotalTimeAscending : sortPtr = sortFunctionMeanTotalTimeDescending;
+      break;
+    case TotalTime:
+      so == Ascending ? sortPtr = sortFunctionTotalTimeAscending : sortPtr = sortFunctionTotalTimeDescending;
+      break;
+    default:sortPtr = sortFunctionTimeDescending;
   }
+  std::sort(this->m_functions.begin(), this->m_functions.end(), sortPtr);
 }
 
 void Stack::getSortCodes(std::string &calls, std::string &duration,
