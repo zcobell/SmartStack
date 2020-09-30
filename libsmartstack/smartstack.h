@@ -28,6 +28,12 @@
   SmartStack::Instrumentation __SmartStackInstrument = \
       SmartStack::addInstrumentation(fname);
 
+#ifdef __func__
+#define AUTOADD_SMARTSTACK()  ADD_SMARTSTACK(__func__)
+#else
+#define AUTOADD_SMARTSTACK #error "__func__ not defined"
+#endif
+
 #define END_SMARTSTACK() SmartStack::endSession();
 
 namespace SmartStack {
@@ -61,7 +67,7 @@ printFunction(const std::string &message = std::string()) {
 void SMARTSTACK_EXPORT printTimingReport(
     SmartStack::Stack::SortType sortType = SmartStack::Stack::SortType::Time,
     SmartStack::Stack::SortOrder sortOrder =
-        SmartStack::Stack::SortOrder::Decending) {
+    SmartStack::Stack::SortOrder::Descending) {
   SmartStack::Stack::printTimingReport(sortType, sortOrder);
 }
 
@@ -69,7 +75,7 @@ void SMARTSTACK_EXPORT saveTimingReport(
     const std::string &filename,
     SmartStack::Stack::SortType sortType = SmartStack::Stack::SortType::Time,
     SmartStack::Stack::SortOrder sortOrder =
-        SmartStack::Stack::SortOrder::Decending) {
+    SmartStack::Stack::SortOrder::Descending) {
   SmartStack::Stack::saveTimingReport(filename, sortType, sortOrder);
 }
 

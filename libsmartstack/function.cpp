@@ -18,7 +18,9 @@
 //------------------------------------------------------------------------//
 #include "function.h"
 
-Function::Function(const std::string &name) : m_name(name), m_ncall(0) {}
+#include <utility>
+
+Function::Function(std::string name) : m_name(std::move(name)), m_ncall(0) {}
 
 void Function::startFunction() {
   this->m_timer.startClock();

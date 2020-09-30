@@ -28,52 +28,52 @@ using namespace SmartStack;
 
 bool sortFunctionTimeDecending(const std::unique_ptr<Function> &a,
                                const std::unique_ptr<Function> &b) {
-  return a.get()->timer()->elapsed() > b.get()->timer()->elapsed();
+  return a->timer()->elapsed() > b.get()->timer()->elapsed();
 }
 
 bool sortFunctionTimeAscending(const std::unique_ptr<Function> &a,
                                const std::unique_ptr<Function> &b) {
-  return a.get()->timer()->elapsed() < b.get()->timer()->elapsed();
+  return a->timer()->elapsed() < b.get()->timer()->elapsed();
 }
 
 bool sortFunctionCallsDecending(const std::unique_ptr<Function> &a,
                                 const std::unique_ptr<Function> &b) {
-  return a.get()->numCalls() > b.get()->numCalls();
+  return a->numCalls() > b.get()->numCalls();
 }
 
 bool sortFunctionCallsAscending(const std::unique_ptr<Function> &a,
                                 const std::unique_ptr<Function> &b) {
-  return a.get()->numCalls() < b.get()->numCalls();
+  return a->numCalls() < b.get()->numCalls();
 }
 
 bool sortFunctionMeanTimeDecending(const std::unique_ptr<Function> &a,
                                    const std::unique_ptr<Function> &b) {
-  return a.get()->meanDuration() > b.get()->meanDuration();
+  return a->meanDuration() > b.get()->meanDuration();
 }
 
 bool sortFunctionMeanTimeAscending(const std::unique_ptr<Function> &a,
                                    const std::unique_ptr<Function> &b) {
-  return a.get()->meanDuration() < b.get()->meanDuration();
+  return a->meanDuration() < b.get()->meanDuration();
 }
 
 bool sortFunctionMeanTotalTimeAscending(const std::unique_ptr<Function> &a,
                                         const std::unique_ptr<Function> &b) {
-  return a.get()->meanGlobalDuration() < b.get()->meanGlobalDuration();
+  return a->meanGlobalDuration() < b.get()->meanGlobalDuration();
 }
 
 bool sortFunctionMeanTotalTimeDecending(const std::unique_ptr<Function> &a,
                                         const std::unique_ptr<Function> &b) {
-  return a.get()->meanGlobalDuration() > b.get()->meanGlobalDuration();
+  return a->meanGlobalDuration() > b.get()->meanGlobalDuration();
 }
 
 bool sortFunctionTotalTimeAscending(const std::unique_ptr<Function> &a,
                                     const std::unique_ptr<Function> &b) {
-  return a.get()->timer()->globalElapsed() < b.get()->timer()->globalElapsed();
+  return a->timer()->globalElapsed() < b.get()->timer()->globalElapsed();
 }
 
 bool sortFunctionTotalTimeDecending(const std::unique_ptr<Function> &a,
                                     const std::unique_ptr<Function> &b) {
-  return a.get()->timer()->globalElapsed() > b.get()->timer()->globalElapsed();
+  return a->timer()->globalElapsed() > b.get()->timer()->globalElapsed();
 }
 
 Stack::Stack()
@@ -83,6 +83,7 @@ Stack::Stack()
       m_started(false),
       m_firstProfile(true),
       m_logToFile(false),
+      m_proc0toScreen(false),
       m_reportUnits(TimeUnits::Microseconds) {
   this->m_functionStack.reserve(5000);
   this->m_functions.reserve(5000);
@@ -149,7 +150,6 @@ void Stack::saveTimingReport(const std::string &filename,
         Stack::get().generateTableTimingReport(st, so);
     Stack::get().m_saveTableTimimgReport(report, filename);
   }
-  return;
 }
 
 bool Stack::sessionStarted() { return Stack::get().m_sessionStarted(); }
@@ -158,7 +158,7 @@ void Stack::setReportUnits(const Stack::TimeUnits &units) {
   Stack::get().m_setReportUnits(units);
 }
 
-bool Stack::m_sessionStarted() { return this->m_started; }
+bool Stack::m_sessionStarted() const { return this->m_started; }
 
 void Stack::m_startSession(const std::string &session, int procid,
                            const bool proc0ToScreen,
@@ -175,7 +175,7 @@ void Stack::m_startSession(const std::string &session, int procid,
   } else {
     this->m_procString = "";
   }
-  if (logfile != std::string()) {
+  if (!logfile.empty()) {
     this->m_logToFile = true;
     this->m_logfile = logfile;
     std::ifstream f(this->m_logfile);
@@ -213,7 +213,7 @@ Function *Stack::createFunction(const std::string &name) {
 }
 
 void Stack::m_startFunction(const std::string &functionName) {
-  if (this->m_functionStack.size() > 0) {
+  if (!this->m_functionStack.empty()) {
     this->m_functionStack.back()->pauseFunction();
   }
   Function *f = this->getFunctionPointer(functionName);
@@ -226,7 +226,7 @@ void Stack::m_endFunction() {
   Function *f = this->m_functionStack.back();
   f->endFunction();
   this->m_functionStack.pop_back();
-  if (this->m_functionStack.size() > 0) {
+  if (!this->m_functionStack.empty()) {
     this->m_functionStack.back()->restartFunction();
   }
   return;
@@ -276,7 +276,7 @@ std::string Stack::m_getCurrentStack(const std::string &message) const {
       first = false;
     }
   }
-  if (message != std::string()) {
+  if (!message.empty()) {
     s += ": " + message;
   }
   return s;
@@ -291,7 +291,7 @@ std::string Stack::m_getCurrentFunction(const std::string &message) const {
     s = "[" + this->m_sessionName + " " + this->m_procString +
         "]: " + this->m_functionStack.back()->name();
   }
-  if (message != std::string()) {
+  if (!message.empty()) {
     s += ": " + message;
   }
   return s;
@@ -301,28 +301,28 @@ void Stack::sortFunctions(const SortType &st, const SortOrder &so) {
   if (st == Time && so == Ascending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
               sortFunctionTimeAscending);
-  } else if (st == Time && so == Decending) {
+  } else if (st == Time && so == Descending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
               sortFunctionTimeDecending);
   } else if (st == Calls && so == Ascending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
               sortFunctionCallsAscending);
-  } else if (st == Calls && so == Decending) {
+  } else if (st == Calls && so == Descending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
               sortFunctionCallsDecending);
   } else if (st == MeanTime && so == Ascending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
               sortFunctionMeanTimeAscending);
-  } else if (st == MeanTime && so == Decending) {
+  } else if (st == MeanTime && so == Descending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
               sortFunctionMeanTimeDecending);
-  } else if (st == MeanTotalTime && so == Decending) {
+  } else if (st == MeanTotalTime && so == Descending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
               sortFunctionMeanTotalTimeDecending);
   } else if (st == MeanTotalTime && so == Ascending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
               sortFunctionMeanTotalTimeAscending);
-  } else if (st == TotalTime && so == Decending) {
+  } else if (st == TotalTime && so == Descending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
               sortFunctionTotalTimeDecending);
   } else if (st == TotalTime && so == Ascending) {
@@ -332,7 +332,6 @@ void Stack::sortFunctions(const SortType &st, const SortOrder &so) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
               sortFunctionTimeDecending);
   }
-  return;
 }
 
 void Stack::getSortCodes(std::string &calls, std::string &duration,
@@ -374,7 +373,6 @@ void Stack::getSortCodes(std::string &calls, std::string &duration,
     meanTotalDuration = so == Ascending ? upArrow : downArrow;
     duration = blank;
   }
-  return;
 }
 
 std::vector<std::string> Stack::generateTableTimingReport(const SortType &st,
@@ -391,24 +389,22 @@ std::vector<std::string> Stack::generateTableTimingReport(const SortType &st,
   size_t padsize = (this->maxNumFunctionChars(13) - 13) / 2;
   std::string pad = std::string(padsize + 1, ' ');
 
-  size_t dashpadlen = 0;
-  std::string dashfn;
-  dashfn = std::string(2 * padsize + 16, '-');
+  std::string dashfn = std::string(2 * padsize + 16, '-');
   std::string fn = pad + " Function Name" + pad;
   std::string headerbar =
       "|----------|" + dashfn +
-      "|-------------|----------------------------|----------------------------"
-      "---|----------------------------------|---------------------------------"
-      "-----|";
+          "|-------------|----------------------------|----------------------------"
+          "---|----------------------------------|---------------------------------"
+          "-----|";
 
   table.push_back("Function report for: " + this->m_sessionName);
   table.push_back(headerbar);
   table.push_back("|   Rank   |" + fn + "| " + callCode + " Calls   |  " +
-                  durationCode + "  Local Duration  " + unit + " | " +
-                  meanDurationCode + "  Mean Local Duration " + unit + " |  " +
-                  totalDurationCode + " Local + Child Duration " + unit +
-                  " | " + meanTotalDurationCode +
-                  " Mean Local + Child Duration " + unit + " |");
+      durationCode + "  Local Duration  " + unit + " | " +
+      meanDurationCode + "  Mean Local Duration " + unit + " |  " +
+      totalDurationCode + " Local + Child Duration " + unit +
+      " | " + meanTotalDurationCode +
+      " Mean Local + Child Duration " + unit + " |");
   table.push_back(headerbar);
 
   size_t i = 0;
@@ -430,29 +426,19 @@ std::string Stack::m_unitsString(const Stack::TimeUnits &units,
                                  bool trim) const {
   if (!trim) {
     switch (units) {
-      case Microseconds:
-        return "(us)";
-      case Milliseconds:
-        return "(ms)";
-      case Seconds:
-        return "(s) ";
-      case Minutes:
-        return "(m) ";
-      case Hours:
-        return "(h) ";
+      case Microseconds:return "(us)";
+      case Milliseconds:return "(ms)";
+      case Seconds:return "(s) ";
+      case Minutes:return "(m) ";
+      case Hours:return "(h) ";
     }
   } else {
     switch (units) {
-      case Microseconds:
-        return "_us";
-      case Milliseconds:
-        return "_ms";
-      case Seconds:
-        return "_s";
-      case Minutes:
-        return "_m";
-      case Hours:
-        return "_h";
+      case Microseconds:return "_us";
+      case Milliseconds:return "_ms";
+      case Seconds:return "_s";
+      case Minutes:return "_m";
+      case Hours:return "_h";
     }
   }
   return "?";
@@ -470,7 +456,7 @@ void Stack::m_saveCsvTimingReport(const std::string &filename) {
   Stack::TimeUnits u = this->m_reportUnits;
   std::string unit = this->m_unitsString(this->m_reportUnits, true);
   f << "Rank,Function,NumCalls,LocalTime" + unit + ",MeanLocalTime" + unit +
-           ",LocalAndChildTime" + unit + "," + "MeanLocalAndChildTime" + unit
+      ",LocalAndChildTime" + unit + "," + "MeanLocalAndChildTime" + unit
     << std::endl;
   size_t i = 0;
   for (auto &fn : this->m_functions) {
@@ -481,13 +467,12 @@ void Stack::m_saveCsvTimingReport(const std::string &filename) {
 }
 
 void Stack::m_saveTableTimimgReport(const std::vector<std::string> &report,
-                                    const std::string &filename) const {
+                                    const std::string &filename) {
   std::ofstream output(filename);
   for (auto &s : report) {
     output << s << std::endl;
   }
   output.close();
-  return;
 }
 
 std::string Stack::m_getFunctionReportLine(
@@ -498,20 +483,15 @@ std::string Stack::m_getFunctionReportLine(
       units == Milliseconds) {
     double multiplier = 1.0;
     switch (units) {
-      case Seconds:
-        multiplier = 1e6;
+      case Seconds:multiplier = 1e6;
         break;
-      case Minutes:
-        multiplier = 1e6 * 60.0;
+      case Minutes:multiplier = 1e6 * 60.0;
         break;
-      case Hours:
-        multiplier = 1e6 * 60.0 * 60.0;
+      case Hours:multiplier = 1e6 * 60.0 * 60.0;
         break;
-      case Milliseconds:
-        multiplier = 1000.0;
+      case Milliseconds:multiplier = 1000.0;
         break;
-      default:
-        multiplier = 1.0;
+      default:multiplier = 1.0;
         break;
     }
 
@@ -526,8 +506,8 @@ std::string Stack::m_getFunctionReportLine(
       size_t fnnamemx = this->maxNumFunctionChars(13);
       std::string formatLine =
           std::string() + "| %8zu | %" + formatStringChar(fnnamemx) +
-          "s | %11lld |            %9.9e |               %9.9e |       "
-          "           %9.9e |                      %9.9e |";
+              "s | %11lld |            %9.9e |               %9.9e |       "
+              "           %9.9e |                      %9.9e |";
 
       snprintf(line, 400, formatLine.c_str(), i, f->name().c_str(),
                f->numCalls(), ts, mts, ats, amts);
@@ -540,9 +520,9 @@ std::string Stack::m_getFunctionReportLine(
       size_t fnnamemx = this->maxNumFunctionChars(13);
       std::string formatLine =
           std::string() + "| %8zu | %" + formatStringChar(fnnamemx) +
-          "s | %11lld |         %18lld |            %18lld "
-          "|               %18lld |  "
-          "                 %18lld |";
+              "s | %11lld |         %18lld |            %18lld "
+              "|               %18lld |  "
+              "                 %18lld |";
       snprintf(line, 400, formatLine.c_str(), i, f->name().c_str(),
                f->numCalls(), f->timer()->elapsed(), f->meanDuration(),
                f->timer()->globalElapsed(), f->meanGlobalDuration());
@@ -557,9 +537,10 @@ std::string Stack::m_getFunctionReportLine(
 }
 
 double Stack::convertTimeUnitsDouble(const long long time,
-                                     const double multiplier) const {
-  long long t = time / multiplier;
-  return static_cast<double>(t) + static_cast<double>(time - t) / multiplier;
+                                     const double multiplier) {
+  auto td = static_cast<double>(time);
+  auto t = td / multiplier;
+  return t + (td - t) / multiplier;
 }
 
 size_t Stack::maxNumFunctionChars(size_t lowerLimit) const {
@@ -571,7 +552,7 @@ size_t Stack::maxNumFunctionChars(size_t lowerLimit) const {
   return mx + 1;
 }
 
-std::string Stack::formatStringChar(size_t n) const {
+std::string Stack::formatStringChar(size_t n) {
   char line[20];
   if (n == 13)
     snprintf(line, 20, "%zu", n + 1);

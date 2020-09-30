@@ -3,7 +3,7 @@
         MODULE SMARTSTACKMODULE
             USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_PTR
             IMPLICIT NONE
-            
+
             INTEGER,PARAMETER :: SMARTSTACK_SORTASCENDING = 10000
             INTEGER,PARAMETER :: SMARTSTACK_SORTDECENDING = 10001
 
@@ -16,7 +16,7 @@
             INTEGER,PARAMETER :: SMARTSTACK_SECONDS       = 30002
             INTEGER,PARAMETER :: SMARTSTACK_MINUTES       = 30003
             INTEGER,PARAMETER :: SMARTSTACK_HOURS         = 30004
-    
+
             INTEGER,PARAMETER :: SMARTSTACK_TABLE         = 40000
             INTEGER,PARAMETER :: SMARTSTACK_CSV           = 40001
 
@@ -39,7 +39,7 @@
                     IMPLICIT NONE
                     CHARACTER(KIND=C_CHAR),INTENT(IN) :: functionName
                 END FUNCTION c_createSmartStack
-                
+
                 TYPE(C_PTR) FUNCTION c_createSmartStackShowTrace(functionName) &
                         BIND(C,NAME="addSmartStackShowFtn") RESULT(ptr)
                     USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR
@@ -57,16 +57,16 @@
                     USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_INT,C_BOOL
                     IMPLICIT NONE
                     CHARACTER(KIND=C_CHAR),INTENT(IN)     :: session_name
-                    INTEGER(KIND=C_INT),VALUE,INTENT(IN)  :: processorId 
+                    INTEGER(KIND=C_INT),VALUE,INTENT(IN)  :: processorId
                     LOGICAL(KIND=C_BOOL),VALUE,INTENT(IN) :: proc0ToScreen
                 END SUBROUTINE c_startSession
-                
+
                 SUBROUTINE c_startSessionLog(session_name,processorId,proc0ToScreen,logFile) BIND(C,NAME="startSessionLogFtn")
                     USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_INT,C_BOOL
                     IMPLICIT NONE
                     CHARACTER(KIND=C_CHAR),INTENT(IN)     :: session_name
                     CHARACTER(KIND=C_CHAR),INTENT(IN)     :: logFile
-                    INTEGER(KIND=C_INT),VALUE,INTENT(IN)  :: processorId 
+                    INTEGER(KIND=C_INT),VALUE,INTENT(IN)  :: processorId
                     LOGICAL(KIND=C_BOOL),VALUE,INTENT(IN) :: proc0ToScreen
                 END SUBROUTINE c_startSessionLog
 
@@ -77,17 +77,17 @@
                 SUBROUTINE c_printStack() BIND(C,NAME="printCurrentStackFtn")
                     IMPLICIT NONE
                 END SUBROUTINE c_printStack
-                
+
                 SUBROUTINE c_printStackMessage(message) BIND(C,NAME="printCurrentStackMessageFtn")
                     USE,INTRINSIC :: ISO_C_BINDING,ONLY: C_CHAR
                     IMPLICIT NONE
                     CHARACTER(KIND=C_CHAR),INTENT(IN) :: message
                 END SUBROUTINE c_printStackMessage
-                
+
                 SUBROUTINE c_printCurrentFunction() BIND(C,NAME="printCurrentFunctionFtn")
                     IMPLICIT NONE
                 END SUBROUTINE c_printCurrentFunction
-                
+
                 SUBROUTINE c_printCurrentFunctionMessage(message) BIND(C,NAME="printCurrentFunctionMessageFtn")
                     USE,INTRINSIC :: ISO_C_BINDING,ONLY: C_CHAR
                     IMPLICIT NONE
@@ -156,7 +156,7 @@
                 FUNCTION constructor(function_name,showStack) RESULT(this)
                     USE,INTRINSIC                   :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_BOOL,&
                                                                                 C_NULL_CHAR
-                    LOGICAL,INTENT(IN),OPTIONAL     :: showStack                                                                            
+                    LOGICAL,INTENT(IN),OPTIONAL     :: showStack
                     TYPE(SMARTSTACK)                :: this
                     CHARACTER(*),INTENT(IN)         :: function_name
                     LOGICAL                         :: doShowStack
@@ -221,7 +221,7 @@
                         CALL c_printStack()
                     ENDIF
                 END SUBROUTINE SmartStack_printCurrentStack
-                
+
                 SUBROUTINE SmartStack_printCurrentFunction(message)
                     USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_CHAR,C_NULL_CHAR
                     IMPLICIT NONE
@@ -233,7 +233,7 @@
                     ENDIF
                 END SUBROUTINE SmartStack_printCurrentFunction
 
-                SUBROUTINE SmartStack_getCurrentStack(buffer) 
+                SUBROUTINE SmartStack_getCurrentStack(buffer)
                     IMPLICIT NONE
                     CHARACTER(*),INTENT(OUT) :: buffer
                     CALL c_getCurrentStack()
@@ -246,8 +246,8 @@
                     buffer = c_string_buffer
                     DEALLOCATE(c_string_buffer)
                 END SUBROUTINE SmartStack_getCurrentStack
-                
-                SUBROUTINE SmartStack_getCurrentFunction(buffer) 
+
+                SUBROUTINE SmartStack_getCurrentFunction(buffer)
                     IMPLICIT NONE
                     CHARACTER(*),INTENT(OUT) :: buffer
                     CALL c_getCurrentFunction()

@@ -26,7 +26,7 @@
 
 class Function {
  public:
-  SMARTSTACK_EXPORT Function(const std::string &name);
+  SMARTSTACK_EXPORT explicit Function(std::string name);
 
   void SMARTSTACK_EXPORT startFunction();
   void SMARTSTACK_EXPORT endFunction();

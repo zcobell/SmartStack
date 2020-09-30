@@ -27,7 +27,7 @@
 namespace SmartStack {
 class Instrumentation {
  public:
-  SMARTSTACK_EXPORT Instrumentation(const std::string &functionName,
+  SMARTSTACK_EXPORT explicit Instrumentation(const std::string &functionName,
                                     bool showStack = false)
       : m_showStack(showStack) {
     SmartStack::Stack::startFunction(functionName, this->m_showStack);

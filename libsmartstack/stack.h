@@ -37,14 +37,14 @@ namespace SmartStack {
 
 class Stack {
  public:
-  enum SortOrder { Ascending, Decending };
+  enum SortOrder { Ascending, Descending };
   enum SortType { Time, MeanTime, TotalTime, MeanTotalTime, Calls };
   enum TimeUnits { Microseconds, Milliseconds, Seconds, Minutes, Hours };
   enum OutputFormat { Table, CSV };
 
   static void SMARTSTACK_EXPORT
   startSession(const std::string &session, const int &processorId = -1,
-               const bool proc0ToScreen = false,
+               bool proc0ToScreen = false,
                const std::string &logfile = std::string());
   static void SMARTSTACK_EXPORT endSession();
   static void SMARTSTACK_EXPORT startFunction(const std::string &functionName,
@@ -57,10 +57,10 @@ class Stack {
   static std::string SMARTSTACK_EXPORT getCurrentStack();
   static std::string SMARTSTACK_EXPORT getCurrentFunction();
   static void SMARTSTACK_EXPORT printTimingReport(
-      const Stack::SortType &st = Time, const Stack::SortOrder &so = Decending);
+      const Stack::SortType &st = Time, const Stack::SortOrder &so = Descending);
   static void SMARTSTACK_EXPORT saveTimingReport(
       const std::string &filename, const Stack::SortType &st = Time,
-      const Stack::SortOrder &so = Decending,
+      const Stack::SortOrder &so = Descending,
       const Stack::OutputFormat &of = Stack::OutputFormat::Table);
   static bool SMARTSTACK_EXPORT sessionStarted();
   static void SMARTSTACK_EXPORT setReportUnits(const Stack::TimeUnits &units);
@@ -90,9 +90,9 @@ class Stack {
   std::unordered_map<std::string, Function *> m_functionLookup;
 #endif
 
-  bool m_sessionStarted();
+  bool m_sessionStarted() const;
   void m_startSession(const std::string &session, int procid = -1,
-                      const bool proc0ToScreen = false,
+                      bool proc0ToScreen = false,
                       const std::string &logfile = std::string());
   void m_endSession();
   void m_endFunction();
@@ -100,8 +100,8 @@ class Stack {
   void m_printCurrentFunction(const std::string &message = std::string()) const;
   void m_printCurrentStack(const std::string &message = std::string()) const;
   void m_printTimingReport(const std::vector<std::string> &report) const;
-  void m_saveTableTimimgReport(const std::vector<std::string> &report,
-                               const std::string &filename) const;
+  static void m_saveTableTimimgReport(const std::vector<std::string> &report,
+                               const std::string &filename) ;
   void m_saveCsvTimingReport(const std::string &filename);
   std::string m_getFunctionReportLine(size_t i, Function *f,
                                       const TimeUnits &units, const OutputFormat &format) const;
@@ -110,7 +110,7 @@ class Stack {
   std::string m_getCurrentFunction(
       const std::string &message = std::string()) const;
   void sortFunctions(const SortType &st, const SortOrder &so);
-  void getSortCodes(std::string &calls, std::string &duration,
+  static void getSortCodes(std::string &calls, std::string &duration,
                     std::string &meanDuration, std::string &totalDuration,
                     std::string &meanTotalDuration, const SortType &st,
                     const Stack::SortOrder &so);
@@ -118,10 +118,10 @@ class Stack {
                                                      const SortOrder &so);
   void m_setReportUnits(const Stack::TimeUnits &units);
   std::string m_unitsString(const Stack::TimeUnits &units, bool trim) const;
-  double convertTimeUnitsDouble(const long long time,
-                                const double multiplier) const;
+  static double convertTimeUnitsDouble(long long time,
+                                double multiplier) ;
   size_t maxNumFunctionChars(size_t lowerLimit = 0) const;
-  std::string formatStringChar(size_t n) const;
+  static std::string formatStringChar(size_t n) ;
 
   void writeHeader();
   void writeFooter();

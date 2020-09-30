@@ -51,7 +51,7 @@ constexpr std::array<SmartStack::Stack::SortType, 3> c_sortTypeList = {
 
 constexpr std::array<SmartStack::Stack::SortOrder, 2> c_sortOrderList = {
     SmartStack::Stack::SortOrder::Ascending,
-    SmartStack::Stack::SortOrder::Decending};
+    SmartStack::Stack::SortOrder::Descending};
 
 constexpr std::array<SmartStack::Stack::TimeUnits, 5> c_unitsList = {
     SmartStack::Stack::Microseconds, SmartStack::Stack::Milliseconds,
