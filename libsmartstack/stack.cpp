@@ -18,62 +18,66 @@
 //------------------------------------------------------------------------//
 #include "stack.h"
 
-#include <stdio.h>
-
+#include <cstdio>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
 
 using namespace SmartStack;
 
-bool sortFunctionTimeDecending(const std::unique_ptr<Function> &a,
-                               const std::unique_ptr<Function> &b) {
-  return a->timer()->elapsed() > b.get()->timer()->elapsed();
+Stack &Stack::get() {
+  static Stack instance;
+  return instance;
+}
+
+bool sortFunctionTimeDescending(const std::unique_ptr<Function> &a,
+                                const std::unique_ptr<Function> &b) {
+  return a->timer()->elapsed() > b->timer()->elapsed();
 }
 
 bool sortFunctionTimeAscending(const std::unique_ptr<Function> &a,
                                const std::unique_ptr<Function> &b) {
-  return a->timer()->elapsed() < b.get()->timer()->elapsed();
+  return a->timer()->elapsed() < b->timer()->elapsed();
 }
 
-bool sortFunctionCallsDecending(const std::unique_ptr<Function> &a,
-                                const std::unique_ptr<Function> &b) {
-  return a->numCalls() > b.get()->numCalls();
+bool sortFunctionCallsDescending(const std::unique_ptr<Function> &a,
+                                 const std::unique_ptr<Function> &b) {
+  return a->numCalls() > b->numCalls();
 }
 
 bool sortFunctionCallsAscending(const std::unique_ptr<Function> &a,
                                 const std::unique_ptr<Function> &b) {
-  return a->numCalls() < b.get()->numCalls();
+  return a->numCalls() < b->numCalls();
 }
 
-bool sortFunctionMeanTimeDecending(const std::unique_ptr<Function> &a,
-                                   const std::unique_ptr<Function> &b) {
-  return a->meanDuration() > b.get()->meanDuration();
+bool sortFunctionMeanTimeDescending(const std::unique_ptr<Function> &a,
+                                    const std::unique_ptr<Function> &b) {
+  return a->meanDuration() > b->meanDuration();
 }
 
 bool sortFunctionMeanTimeAscending(const std::unique_ptr<Function> &a,
                                    const std::unique_ptr<Function> &b) {
-  return a->meanDuration() < b.get()->meanDuration();
+  return a->meanDuration() < b->meanDuration();
 }
 
 bool sortFunctionMeanTotalTimeAscending(const std::unique_ptr<Function> &a,
                                         const std::unique_ptr<Function> &b) {
-  return a->meanGlobalDuration() < b.get()->meanGlobalDuration();
+  return a->meanGlobalDuration() < b->meanGlobalDuration();
 }
 
-bool sortFunctionMeanTotalTimeDecending(const std::unique_ptr<Function> &a,
-                                        const std::unique_ptr<Function> &b) {
-  return a->meanGlobalDuration() > b.get()->meanGlobalDuration();
+bool sortFunctionMeanTotalTimeDescending(const std::unique_ptr<Function> &a,
+                                         const std::unique_ptr<Function> &b) {
+  return a->meanGlobalDuration() > b->meanGlobalDuration();
 }
 
 bool sortFunctionTotalTimeAscending(const std::unique_ptr<Function> &a,
                                     const std::unique_ptr<Function> &b) {
-  return a->timer()->globalElapsed() < b.get()->timer()->globalElapsed();
+  return a->timer()->globalElapsed() < b->timer()->globalElapsed();
 }
 
-bool sortFunctionTotalTimeDecending(const std::unique_ptr<Function> &a,
-                                    const std::unique_ptr<Function> &b) {
-  return a->timer()->globalElapsed() > b.get()->timer()->globalElapsed();
+bool sortFunctionTotalTimeDescending(const std::unique_ptr<Function> &a,
+                                     const std::unique_ptr<Function> &b) {
+  return a->timer()->globalElapsed() > b->timer()->globalElapsed();
 }
 
 Stack::Stack()
@@ -135,7 +139,7 @@ std::string Stack::getCurrentFunction() {
 void Stack::printTimingReport(const SortType &st, const SortOrder &so) {
   std::vector<std::string> report =
       Stack::get().generateTableTimingReport(st, so);
-  Stack::get().m_printTimingReport(report);
+  Stack::m_printTimingReport(report);
 }
 
 void Stack::saveTimingReport(const std::string &filename,
@@ -148,7 +152,7 @@ void Stack::saveTimingReport(const std::string &filename,
   } else {
     std::vector<std::string> report =
         Stack::get().generateTableTimingReport(st, so);
-    Stack::get().m_saveTableTimimgReport(report, filename);
+    Stack::m_saveTableTimimgReport(report, filename);
   }
 }
 
@@ -206,9 +210,8 @@ Function *Stack::getFunctionPointer(const std::string &functionName) {
 }
 
 Function *Stack::createFunction(const std::string &name) {
-  std::unique_ptr<Function> f(new Function(name));
-  this->m_functionLookup[name] = f.get();
-  this->m_functions.push_back(std::move(f));
+  this->m_functions.emplace_back(std::make_unique<Function>(name));
+  this->m_functionLookup[name] = this->m_functions.back().get();
   return this->m_functions.back().get();
 }
 
@@ -219,7 +222,6 @@ void Stack::m_startFunction(const std::string &functionName) {
   Function *f = this->getFunctionPointer(functionName);
   f->startFunction();
   this->m_functionStack.push_back(f);
-  return;
 }
 
 void Stack::m_endFunction() {
@@ -229,7 +231,6 @@ void Stack::m_endFunction() {
   if (!this->m_functionStack.empty()) {
     this->m_functionStack.back()->restartFunction();
   }
-  return;
 }
 
 void Stack::m_printCurrentStack(const std::string &message) const {
@@ -303,34 +304,34 @@ void Stack::sortFunctions(const SortType &st, const SortOrder &so) {
               sortFunctionTimeAscending);
   } else if (st == Time && so == Descending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
-              sortFunctionTimeDecending);
+              sortFunctionTimeDescending);
   } else if (st == Calls && so == Ascending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
               sortFunctionCallsAscending);
   } else if (st == Calls && so == Descending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
-              sortFunctionCallsDecending);
+              sortFunctionCallsDescending);
   } else if (st == MeanTime && so == Ascending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
               sortFunctionMeanTimeAscending);
   } else if (st == MeanTime && so == Descending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
-              sortFunctionMeanTimeDecending);
+              sortFunctionMeanTimeDescending);
   } else if (st == MeanTotalTime && so == Descending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
-              sortFunctionMeanTotalTimeDecending);
+              sortFunctionMeanTotalTimeDescending);
   } else if (st == MeanTotalTime && so == Ascending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
               sortFunctionMeanTotalTimeAscending);
   } else if (st == TotalTime && so == Descending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
-              sortFunctionTotalTimeDecending);
+              sortFunctionTotalTimeDescending);
   } else if (st == TotalTime && so == Ascending) {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
               sortFunctionTotalTimeAscending);
   } else {
     std::sort(this->m_functions.begin(), this->m_functions.end(),
-              sortFunctionTimeDecending);
+              sortFunctionTimeDescending);
   }
 }
 
@@ -382,7 +383,7 @@ std::vector<std::string> Stack::generateTableTimingReport(const SortType &st,
       meanTotalDurationCode;
   this->getSortCodes(callCode, durationCode, meanDurationCode,
                      totalDurationCode, meanTotalDurationCode, st, so);
-  std::string unit = this->m_unitsString(this->m_reportUnits, false);
+  std::string unit = SmartStack::Stack::m_unitsString(this->m_reportUnits, false);
 
   std::vector<std::string> table;
 
@@ -423,7 +424,7 @@ void Stack::m_setReportUnits(const Stack::TimeUnits &units) {
 }
 
 std::string Stack::m_unitsString(const Stack::TimeUnits &units,
-                                 bool trim) const {
+                                 bool trim) {
   if (!trim) {
     switch (units) {
       case Microseconds:return "(us)";
@@ -444,11 +445,10 @@ std::string Stack::m_unitsString(const Stack::TimeUnits &units,
   return "?";
 }
 
-void Stack::m_printTimingReport(const std::vector<std::string> &report) const {
+void Stack::m_printTimingReport(const std::vector<std::string> &report) {
   for (auto &s : report) {
     std::cout << s << std::endl;
   }
-  return;
 }
 
 void Stack::m_saveCsvTimingReport(const std::string &filename) {
@@ -495,12 +495,12 @@ std::string Stack::m_getFunctionReportLine(
         break;
     }
 
-    double ts = this->convertTimeUnitsDouble(f->timer()->elapsed(), multiplier);
-    double mts = this->convertTimeUnitsDouble(f->meanDuration(), multiplier);
+    double ts = SmartStack::Stack::convertTimeUnitsDouble(f->timer()->elapsed(), multiplier);
+    double mts = SmartStack::Stack::convertTimeUnitsDouble(f->meanDuration(), multiplier);
     double ats =
-        this->convertTimeUnitsDouble(f->timer()->globalElapsed(), multiplier);
+        SmartStack::Stack::convertTimeUnitsDouble(f->timer()->globalElapsed(), multiplier);
     double amts =
-        this->convertTimeUnitsDouble(f->meanGlobalDuration(), multiplier);
+        SmartStack::Stack::convertTimeUnitsDouble(f->meanGlobalDuration(), multiplier);
 
     if (format == Stack::Table) {
       size_t fnnamemx = this->maxNumFunctionChars(13);

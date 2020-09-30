@@ -99,7 +99,7 @@ class Stack {
   void m_startFunction(const std::string &functionName);
   void m_printCurrentFunction(const std::string &message = std::string()) const;
   void m_printCurrentStack(const std::string &message = std::string()) const;
-  void m_printTimingReport(const std::vector<std::string> &report) const;
+  static void m_printTimingReport(const std::vector<std::string> &report) ;
   static void m_saveTableTimimgReport(const std::vector<std::string> &report,
                                const std::string &filename) ;
   void m_saveCsvTimingReport(const std::string &filename);
@@ -117,7 +117,7 @@ class Stack {
   std::vector<std::string> generateTableTimingReport(const SortType &st,
                                                      const SortOrder &so);
   void m_setReportUnits(const Stack::TimeUnits &units);
-  std::string m_unitsString(const Stack::TimeUnits &units, bool trim) const;
+  static std::string m_unitsString(const Stack::TimeUnits &units, bool trim) ;
   static double convertTimeUnitsDouble(long long time,
                                 double multiplier) ;
   size_t maxNumFunctionChars(size_t lowerLimit = 0) const;
@@ -133,10 +133,7 @@ class Stack {
   ~Stack();
 
   //...Returns a static instance to the SmartStack
-  static Stack &get() {
-    static Stack instance;
-    return instance;
-  }
+  static Stack &get();
 };
 }  // namespace SmartStack
 
