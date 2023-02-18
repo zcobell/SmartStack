@@ -21,34 +21,33 @@
 
 #include <string>
 
-#include "smartstack_global.h"
 #include "timer.h"
 
 class Function {
- public:
-  SMARTSTACK_EXPORT explicit Function(std::string name);
+public:
+  explicit Function(std::string name);
 
-  void SMARTSTACK_EXPORT startFunction();
-  void SMARTSTACK_EXPORT endFunction();
+  void startFunction();
+  void endFunction();
 
-  void SMARTSTACK_EXPORT pauseFunction();
-  void SMARTSTACK_EXPORT restartFunction();
+  void pauseFunction();
+  void restartFunction();
 
-  long long SMARTSTACK_EXPORT meanDuration();
-  long long SMARTSTACK_EXPORT meanGlobalDuration();
+  long long meanDuration() const;
+  long long meanGlobalDuration() const;
 
-  Timer SMARTSTACK_EXPORT *timer();
+  Timer *timer() const;
 
-  std::string SMARTSTACK_EXPORT name() const;
+  std::string name() const;
 
-  long long SMARTSTACK_EXPORT numCalls() const;
+  size_t numCalls() const;
 
-  bool SMARTSTACK_EXPORT running() const;
+  bool running() const;
 
- private:
-  const std::string m_name;
-  long long m_ncall;
-  Timer m_timer;
+private:
+  std::string m_name;
+  size_t m_ncall;
+  mutable Timer m_timer;
 };
 
-#endif  // FUNCTION_H
+#endif // FUNCTION_H

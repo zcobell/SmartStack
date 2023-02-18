@@ -18,25 +18,32 @@
 //------------------------------------------------------------------------//
 #include "timer.h"
 
+/**
+ * @brief Timer::Timer Constructor for the timer class
+ */
 Timer::Timer()
-    : m_totalElapsed(0),
-      m_lastElapsed(0),
-      m_totalGlobalElapsed(0),
+    : m_totalElapsed(0), m_lastElapsed(0), m_totalGlobalElapsed(0),
       m_running(false) {}
 
+/**
+ * @brief Timer::startClock Starts the timer
+ */
 void Timer::startClock() {
   this->m_running = true;
   this->m_startLocal = std::chrono::high_resolution_clock::now();
   this->m_startGlobal = this->m_startLocal;
 }
 
+/**
+ * @brief Timer::stopClock Stops the timer
+ */
 void Timer::stopClock() {
   if (this->m_running) {
     this->m_endLocal = std::chrono::high_resolution_clock::now();
     this->m_endGlobal = this->m_endLocal;
     this->m_lastElapsed = std::chrono::duration_cast<std::chrono::microseconds>(
-        this->m_endLocal - this->m_startLocal)
-        .count();
+                              this->m_endLocal - this->m_startLocal)
+                              .count();
     this->m_totalElapsed += this->m_lastElapsed;
     this->m_totalGlobalElapsed +=
         std::chrono::duration_cast<std::chrono::microseconds>(
@@ -45,37 +52,68 @@ void Timer::stopClock() {
     this->m_running = false;
   }
 }
-
+/**
+ * @brief Timer::pause Pauses the timer
+ */
 void Timer::pause() {
   if (this->m_running) {
     this->m_endLocal = std::chrono::high_resolution_clock::now();
     this->m_lastElapsed = std::chrono::duration_cast<std::chrono::microseconds>(
-        this->m_endLocal - this->m_startLocal)
-        .count();
+                              this->m_endLocal - this->m_startLocal)
+                              .count();
     this->m_totalElapsed += this->m_lastElapsed;
   }
 }
 
+/**
+ * @brief Timer::restart Restarts the timer
+ */
 void Timer::restart() {
   this->m_startLocal = std::chrono::high_resolution_clock::now();
 }
 
-long long Timer::elapsed() const { return this->m_totalElapsed; }
+/**
+ * @brief Timer::elapsed Returns the elapsed time in microseconds
+ * @return Elapsed time in microseconds
+ */
+size_t Timer::elapsed() const { return this->m_totalElapsed; }
 
-long long Timer::globalElapsed() const { return this->m_totalGlobalElapsed; }
+/**
+ * @brief Timer::globalElapsed Returns the elapsed time in microseconds
+ * @return Elapsed time in microseconds
+ */
+size_t Timer::globalElapsed() const { return this->m_totalGlobalElapsed; }
 
-long long Timer::startTime() const {
+/**
+ * @brief Timer::startTime Returns the start time in milliseconds
+ * @return Start time in milliseconds
+ */
+size_t Timer::startTime() const {
   return std::chrono::time_point_cast<std::chrono::milliseconds>(
-      this->m_startLocal)
+             this->m_startLocal)
       .time_since_epoch()
       .count();
 }
 
-long long Timer::endTime() const {
+/**
+ * @brief Timer::endTime Returns the end time in milliseconds
+ * @return End time in milliseconds
+ */
+size_t Timer::endTime() const {
   return std::chrono::time_point_cast<std::chrono::milliseconds>(
-      this->m_endLocal)
+             this->m_endLocal)
       .time_since_epoch()
       .count();
 }
 
+/**
+ * @brief Timer::running Returns true if the timer is running
+ * @return True if the timer is running
+ */
 bool Timer::running() const { return this->m_running; }
+
+/**
+ * @brief Timer::lastElapsed Returns the last elapsed time in microseconds
+ * @return Last elapsed time in microseconds
+ */
+size_t Timer::lastElapsed() const { return this->m_lastElapsed; }

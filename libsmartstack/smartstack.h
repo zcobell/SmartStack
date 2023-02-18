@@ -19,17 +19,18 @@
 #ifndef SMARTSTACK_H
 #define SMARTSTACK_H
 
+#include <stdexcept>
 #include <string>
 
 #include "instrumentation.h"
 #include "smartstack_global.h"
 
-#define ADD_SMARTSTACK(fname)                          \
-  SmartStack::Instrumentation __SmartStackInstrument = \
+#define ADD_SMARTSTACK(fname)                                                  \
+  SmartStack::Instrumentation __SmartStackInstrument =                         \
       SmartStack::addInstrumentation(fname);
 
 #ifdef __func__
-#define AUTOADD_SMARTSTACK()  ADD_SMARTSTACK(__func__)
+#define AUTOADD_SMARTSTACK() ADD_SMARTSTACK(__func__)
 #else
 #define AUTOADD_SMARTSTACK #error "__func__ not defined"
 #endif
@@ -38,60 +39,63 @@
 
 namespace SmartStack {
 
-bool SMARTSTACK_EXPORT sessionStarted() {
-  return SmartStack::Stack::sessionStarted();
-}
+bool sessionStarted() { return SmartStack::Stack::sessionStarted(); }
 
-void SMARTSTACK_EXPORT
-startSession(const std::string &sessionName, const int &procid = -1,
-             const bool proc0ToScreen = false,
-             const std::string &logfile = std::string()) {
+void startSession(const std::string &sessionName, const int &procid = -1,
+                  const bool proc0ToScreen = false,
+                  const std::string &logfile = std::string()) {
   SmartStack::Stack::startSession(sessionName, procid, proc0ToScreen, logfile);
 }
 
-void SMARTSTACK_EXPORT setReportUnits(const Stack::TimeUnits &units) {
-  SmartStack::Stack::setReportUnits(units);
-}
+void endSession() { SmartStack::Stack::endSession(); }
 
-void SMARTSTACK_EXPORT endSession() { SmartStack::Stack::endSession(); }
-
-void SMARTSTACK_EXPORT printStack(const std::string &message = std::string()) {
+void printStack(const std::string &message = std::string()) {
   SmartStack::Stack::printCurrentStack(message);
 }
 
-void SMARTSTACK_EXPORT
-printFunction(const std::string &message = std::string()) {
+void printFunction(const std::string &message = std::string()) {
   SmartStack::Stack::printCurrentFunction(message);
 }
 
-void SMARTSTACK_EXPORT printTimingReport(
-    SmartStack::Stack::SortType sortType = SmartStack::Stack::SortType::Time,
-    SmartStack::Stack::SortOrder sortOrder =
-    SmartStack::Stack::SortOrder::Descending) {
-  SmartStack::Stack::printTimingReport(sortType, sortOrder);
+void printTimingReport(
+    Report::TimeUnits timeUnits = Report::TimeUnits::Milliseconds,
+    Report::SortType sortType = Report::SortType::Time,
+    Report::SortOrder sortOrder = Report::SortOrder::Descending) {
+  Report report(Stack::sessionName(), timeUnits, sortType, sortOrder);
+  auto functions = SmartStack::Stack::getFunctionList();
+  report.printTimingReport(functions);
 }
 
-void SMARTSTACK_EXPORT saveTimingReport(
+void saveTimingReport(
     const std::string &filename,
-    SmartStack::Stack::SortType sortType = SmartStack::Stack::SortType::Time,
-    SmartStack::Stack::SortOrder sortOrder =
-    SmartStack::Stack::SortOrder::Descending) {
-  SmartStack::Stack::saveTimingReport(filename, sortType, sortOrder);
+    Report::TimeUnits timeUnits = Report::TimeUnits::Milliseconds,
+    SmartStack::Report::SortType sortType = SmartStack::Report::SortType::Time,
+    SmartStack::Report::SortOrder sortOrder =
+        SmartStack::Report::SortOrder::Descending,
+    SmartStack::Report::OutputFormat format =
+        SmartStack::Report::OutputFormat::Table) {
+  auto functions = SmartStack::Stack::getFunctionList();
+  Report report(Stack::sessionName(), timeUnits, sortType, sortOrder);
+  if (format == SmartStack::Report::OutputFormat::Table) {
+    report.saveTableTimingReport(functions, filename);
+  } else if (format == SmartStack::Report::OutputFormat::CSV) {
+    report.saveCsvTimingReport(functions, filename);
+  } else {
+    throw std::runtime_error("Invalid output format");
+  }
 }
 
-std::string SMARTSTACK_EXPORT getCurrentStack() {
-  return SmartStack::Stack::getCurrentStack();
-}
+std::string getCurrentStack() { return SmartStack::Stack::getCurrentStack(); }
 
-std::string SMARTSTACK_EXPORT getCurrentFunction() {
+std::string getCurrentFunction() {
   return SmartStack::Stack::getCurrentFunction();
 }
 
-Instrumentation SMARTSTACK_EXPORT
-addInstrumentation(const std::string &functionName, bool showStack = false) {
+Instrumentation addInstrumentation(const std::string &functionName,
+                                   bool showStack = false) {
   return SmartStack::Instrumentation(functionName, showStack);
 }
 
-}  // namespace SmartStack
+} // namespace SmartStack
 
-#endif  // SMARTSTACK_H
+#endif // SMARTSTACK_H

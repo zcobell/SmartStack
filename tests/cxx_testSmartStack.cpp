@@ -23,7 +23,7 @@
 void doSomething();
 void doSomethingElse();
 
-int main(int argv, char** argc) {
+int main(int argv, char **argc) {
   SmartStack::startSession("ADCIRC");
 
   ADD_SMARTSTACK("main");
@@ -33,7 +33,9 @@ int main(int argv, char** argc) {
   }
 
   END_SMARTSTACK();
-  SmartStack::printTimingReport(SmartStack::Stack::TotalTime,SmartStack::Stack::Ascending);
+  SmartStack::printTimingReport(SmartStack::Report::Milliseconds,
+                                SmartStack::Report::TotalTime,
+                                SmartStack::Report::Ascending);
 
   return 0;
 }

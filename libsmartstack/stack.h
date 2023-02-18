@@ -25,7 +25,7 @@
 #include <vector>
 
 #include "function.h"
-#include "smartstack_global.h"
+#include "report.h"
 
 #ifdef USE_ABSEIL_FLAT_MAP
 #include "absl/container/flat_hash_map.h"
@@ -36,51 +36,39 @@
 namespace SmartStack {
 
 class Stack {
- public:
-  enum SortOrder { Ascending, Descending };
-  enum SortType { Time, MeanTime, TotalTime, MeanTotalTime, Calls };
-  enum TimeUnits { Microseconds, Milliseconds, Seconds, Minutes, Hours };
-  enum OutputFormat { Table, CSV };
+public:
+  explicit Stack(size_t reserve = 0);
 
-  static void SMARTSTACK_EXPORT
-  startSession(const std::string &session, const int &processorId = -1,
-               bool proc0ToScreen = false,
-               const std::string &logfile = std::string());
-  static void SMARTSTACK_EXPORT endSession();
-  static void SMARTSTACK_EXPORT startFunction(const std::string &functionName,
-                                              bool showStack = false);
-  static void SMARTSTACK_EXPORT endFunction(bool showStack = false);
-  static void SMARTSTACK_EXPORT
-  printCurrentStack(const std::string &message = std::string());
-  static void SMARTSTACK_EXPORT
-  printCurrentFunction(const std::string &message = std::string());
-  static std::string SMARTSTACK_EXPORT getCurrentStack();
-  static std::string SMARTSTACK_EXPORT getCurrentFunction();
-  static void SMARTSTACK_EXPORT printTimingReport(
-      const Stack::SortType &st = Time, const Stack::SortOrder &so = Descending);
-  static void SMARTSTACK_EXPORT saveTimingReport(
-      const std::string &filename, const Stack::SortType &st = Time,
-      const Stack::SortOrder &so = Descending,
-      const Stack::OutputFormat &of = Stack::OutputFormat::Table);
-  static bool SMARTSTACK_EXPORT sessionStarted();
-  static void SMARTSTACK_EXPORT setReportUnits(const Stack::TimeUnits &units);
+  ~Stack();
 
-#ifndef SMARTSTACK_BENCHMARKING
- private:
-#else
-#warning This library is being built in benchmarking mode. This is dangerous. You have been warned.
-#endif
+  //...Returns a static instance to the SmartStack
+  static Stack *instance();
 
+  static void startSession(const std::string &session,
+                           const int &processorId = -1,
+                           bool proc0ToScreen = false,
+                           const std::string &logfile = std::string());
+  static void endSession();
+  static void startFunction(const std::string &functionName,
+                            bool showStack = false);
+  static void endFunction(bool showStack = false);
+  static void printCurrentStack(const std::string &message = std::string());
+  static void printCurrentFunction(const std::string &message = std::string());
+  static std::string getCurrentStack();
+  static std::string getCurrentFunction();
+  static bool sessionStarted();
+  static std::vector<Function *> getFunctionList();
+  static std::string sessionName();
+
+private:
   int m_procid;
-  std::string m_logfile;
-  std::string m_procString;
   bool m_started;
   bool m_firstProfile;
   bool m_logToFile;
   bool m_proc0toScreen;
   std::string m_sessionName;
-  TimeUnits m_reportUnits;
-
+  std::string m_logfile;
+  std::string m_procString;
   std::vector<std::unique_ptr<Function>> m_functions;
   std::vector<Function *> m_functionStack;
 
@@ -99,42 +87,13 @@ class Stack {
   void m_startFunction(const std::string &functionName);
   void m_printCurrentFunction(const std::string &message = std::string()) const;
   void m_printCurrentStack(const std::string &message = std::string()) const;
-  static void m_printTimingReport(const std::vector<std::string> &report) ;
-  static void m_saveTableTimimgReport(const std::vector<std::string> &report,
-                               const std::string &filename) ;
-  void m_saveCsvTimingReport(const std::string &filename);
-  std::string m_getFunctionReportLine(size_t i, Function *f,
-                                      const TimeUnits &units, const OutputFormat &format) const;
-  std::string m_getCurrentStack(
-      const std::string &message = std::string()) const;
-  std::string m_getCurrentFunction(
-      const std::string &message = std::string()) const;
-  void sortFunctions(const SortType &st, const SortOrder &so);
-  static void getSortCodes(std::string &calls, std::string &duration,
-                    std::string &meanDuration, std::string &totalDuration,
-                    std::string &meanTotalDuration, const SortType &st,
-                    const Stack::SortOrder &so);
-  std::vector<std::string> generateTableTimingReport(const SortType &st,
-                                                     const SortOrder &so);
-  void m_setReportUnits(const Stack::TimeUnits &units);
-  static std::string m_unitsString(const Stack::TimeUnits &units, bool trim) ;
-  static double convertTimeUnitsDouble(long long time,
-                                double multiplier) ;
-  size_t maxNumFunctionChars(size_t lowerLimit = 0) const;
-  static std::string formatStringChar(size_t n) ;
-
-  void writeHeader();
-  void writeFooter();
+  std::string
+  m_getCurrentStack(const std::string &message = std::string()) const;
+  std::string
+  m_getCurrentFunction(const std::string &message = std::string()) const;
   Function *createFunction(const std::string &name);
   Function *getFunctionPointer(const std::string &name);
-
-  Stack(size_t reserve = 0);
-
-  ~Stack();
-
-  //...Returns a static instance to the SmartStack
-  static Stack &get();
 };
-}  // namespace SmartStack
+} // namespace SmartStack
 
-#endif  // STACK_H
+#endif // STACK_H

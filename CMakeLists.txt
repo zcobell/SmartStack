@@ -74,25 +74,19 @@ endif(COVERAGE)
 # ##############################################################################
 
 # ##############################################################################
-# C++ 11/14 Check
+# C++ 17 Check
 # ##############################################################################
 include(CheckCXXCompilerFlag)
-check_cxx_compiler_flag("-std=c++14" COMPILER_SUPPORTS_CXX14)
-if(COMPILER_SUPPORTS_CXX14)
-  set(CMAKE_CXX_STANDARD 14)
+check_cxx_compiler_flag("-std=c++17" COMPILER_SUPPORTS_CXX17)
+if(COMPILER_SUPPORTS_CXX17)
+  set(CMAKE_CXX_STANDARD 17)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
-else(COMPILER_SUPPORTS_CXX14)
-  check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
-  if(COMPILER_SUPPORTS_CXX11)
-    set(CMAKE_CXX_STANDARD 11)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-  else(COMPILER_SUPPORTS_CXX11)
-    message(
-      FATAL_ERROR
-        "The compiler ${CMAKE_CXX_COMPILER} has no C++11/14 support. Please use a different C++ compiler."
-    )
-  endif(COMPILER_SUPPORTS_CXX11)
-endif(COMPILER_SUPPORTS_CXX14)
+else(COMPILER_SUPPORTS_CXX17)
+  message(
+    FATAL_ERROR
+      "The compiler ${CMAKE_CXX_COMPILER} has no C++17 support. Please use a different C++ compiler."
+  )
+endif(COMPILER_SUPPORTS_CXX17)
 # ##############################################################################
 
 # ##############################################################################
@@ -198,6 +192,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles)
 set(SMARTSTACK_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/timer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/function.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/report.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/stack.cpp)
 
 

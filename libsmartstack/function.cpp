@@ -31,11 +31,11 @@ void Function::pauseFunction() { this->m_timer.pause(); }
 
 void Function::restartFunction() { this->m_timer.restart(); }
 
-long long Function::meanDuration() {
+long long Function::meanDuration() const {
   return this->m_timer.elapsed() / this->m_ncall;
 }
 
-long long Function::meanGlobalDuration() {
+long long Function::meanGlobalDuration() const {
   return this->m_timer.globalElapsed() / this->m_ncall;
 }
 
@@ -43,8 +43,8 @@ void Function::endFunction() { this->m_timer.stopClock(); }
 
 std::string Function::name() const { return this->m_name; }
 
-long long Function::numCalls() const { return this->m_ncall; }
+size_t Function::numCalls() const { return this->m_ncall; }
 
-Timer *Function::timer() { return &this->m_timer; }
+Timer *Function::timer() const { return &this->m_timer; }
 
 bool Function::running() const { return this->m_timer.running(); }

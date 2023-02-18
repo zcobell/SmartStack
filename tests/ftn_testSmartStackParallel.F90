@@ -54,12 +54,8 @@
 
             CALL SmartStack_printTimingReport()
 
-            CALL SmartStack_setReportUnits(SMARTSTACK_MILLISECONDS)
             CALL SmartStack_printTimingReport()
-
-            CALL SmartStack_setReportUnits(SMARTSTACK_SECONDS)
-            CALL SmartStack_printTimingReport(SMARTSTACK_SORTCALLS,SMARTSTACK_SORTASCENDING)
-
+            
             CALL SmartStack_saveTimingReport("report.txt",SmartStack_SortCalls,SmartStack_SortAscending)
 
         END PROGRAM smartstack_test

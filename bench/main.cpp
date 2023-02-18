@@ -44,46 +44,6 @@ void initializer() {
   }
 }
 
-static void bench_vectorRandomLookup(benchmark::State &state) {
-  for (auto _ : state) {
-    benchmark::DoNotOptimize(functionList[rand() % c_functionSize]);
-  }
-  state.SetItemsProcessed(state.iterations());
-}
-
-static void bench_compareStrings(benchmark::State &state) {
-  for (auto _ : state) {
-    benchmark::DoNotOptimize(functionList[rand() % c_functionSize] ==
-        functionList[rand() % c_functionSize]);
-  }
-  state.SetItemsProcessed(state.iterations());
-}
-
-static void bench_compareInts(benchmark::State &state) {
-  for (auto _ : state) {
-    benchmark::DoNotOptimize(intList[rand() % c_functionSize] ==
-        intList[rand() % c_functionSize]);
-  }
-  state.SetItemsProcessed(state.iterations());
-}
-
-static void bench_getFunctionPointer(benchmark::State &state) {
-  for (auto _ : state) {
-    benchmark::DoNotOptimize(SmartStack::Stack::get().getFunctionPointer(
-        functionList[rand() % c_functionSize]));
-  }
-  state.SetItemsProcessed(state.iterations());
-}
-
-static void bench_getPointerAndStart(benchmark::State &state) {
-  for (auto _ : state) {
-    Function *f = SmartStack::Stack::get().getFunctionPointer(
-        functionList[rand() % c_functionSize]);
-    f->startFunction();
-  }
-  state.SetItemsProcessed(state.iterations());
-}
-
 static void bench_lookupRandomExistingFunction(benchmark::State &state) {
   for (auto _ : state) {
     SmartStack::Stack::startFunction(functionList[rand() % c_functionSize]);
@@ -122,40 +82,9 @@ static void bench_lookupNewFunction(benchmark::State &state) {
   state.SetItemsProcessed(state.iterations());
 }
 
-static void bench_startTimer(benchmark::State &state) {
-  for (auto _ : state) {
-    benchmark::DoNotOptimize(std::chrono::high_resolution_clock::now());
-  }
-}
-
-static void bench_endTimerAndCount(benchmark::State &state) {
-  for (auto _ : state) {
-    std::chrono::high_resolution_clock::time_point b =
-        std::chrono::high_resolution_clock::now();
-    benchmark::DoNotOptimize(
-        std::chrono::duration_cast<std::chrono::microseconds>(b - t_init)
-            .count());
-  }
-}
-
-static void bench_hashString(benchmark::State &state) {
-  for (auto _ : state) {
-    benchmark::DoNotOptimize(std::hash<std::string>()("function_name"));
-  }
-}
-
 BENCHMARK(bench_lookupRandomExistingFunction);
 BENCHMARK(bench_lookupSameExistingFunction);
 BENCHMARK(bench_lookupNewFunction);
-BENCHMARK(bench_vectorRandomLookup);
-BENCHMARK(bench_compareStrings);
-BENCHMARK(bench_compareInts);
-BENCHMARK(bench_getFunctionPointer);
-BENCHMARK(bench_getPointerAndStart);
-BENCHMARK(bench_createFunctionString);
-BENCHMARK(bench_startTimer);
-BENCHMARK(bench_endTimerAndCount);
-BENCHMARK(bench_hashString);
 
 int main(int argc, char **argv) {
   initializer();

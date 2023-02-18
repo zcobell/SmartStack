@@ -21,26 +21,24 @@
 
 #include <chrono>
 
-#include "smartstack_global.h"
-
 class Timer {
- public:
-  SMARTSTACK_EXPORT Timer();
-  void SMARTSTACK_EXPORT startClock();
-  void SMARTSTACK_EXPORT stopClock();
-  void SMARTSTACK_EXPORT pause();
-  void SMARTSTACK_EXPORT restart();
-  long long SMARTSTACK_EXPORT elapsed() const;
-  long long SMARTSTACK_EXPORT globalElapsed() const;
-  long long SMARTSTACK_EXPORT startTime() const;
-  long long SMARTSTACK_EXPORT endTime() const;
-  long long SMARTSTACK_EXPORT lastElapsed() const;
-  bool SMARTSTACK_EXPORT running() const;
+public:
+  Timer();
+  void startClock();
+  void stopClock();
+  void pause();
+  void restart();
+  [[nodiscard]] size_t elapsed() const;
+  [[nodiscard]] size_t globalElapsed() const;
+  [[nodiscard]] size_t startTime() const;
+  [[nodiscard]] size_t endTime() const;
+  [[nodiscard]] size_t lastElapsed() const;
+  [[nodiscard]] bool running() const;
 
- private:
-  long long m_totalElapsed;
-  long long m_lastElapsed;
-  long long m_totalGlobalElapsed;
+private:
+  size_t m_totalElapsed;
+  size_t m_lastElapsed;
+  size_t m_totalGlobalElapsed;
   bool m_running;
   std::chrono::high_resolution_clock::time_point m_startLocal;
   std::chrono::high_resolution_clock::time_point m_endLocal;
@@ -48,4 +46,4 @@ class Timer {
   std::chrono::high_resolution_clock::time_point m_endGlobal;
 };
 
-#endif  // TIMER_H
+#endif // TIMER_H

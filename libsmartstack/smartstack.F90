@@ -120,12 +120,6 @@
                     IMPLICIT NONE
                 END SUBROUTINE c_getCurrentFunction
 
-                SUBROUTINE c_setReportUnits(unitType) BIND(C,NAME="setReportUnitsFtn")
-                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT
-                    IMPLICIT NONE
-                    INTEGER(KIND=C_INT),INTENT(IN),VALUE :: unitType
-                END SUBROUTINE c_setReportUnits
-
 
             END INTERFACE
 
@@ -307,11 +301,5 @@
                     ENDIF
                     CALL c_saveTimingReport(FILENAME//C_NULL_CHAR,F_SORT_TYPE,F_SORT_ORDER,F_OUTPUT_FORMAT)
                 END SUBROUTINE SmartStack_saveTimingReport
-
-                SUBROUTINE SmartStack_setReportUnits(unitType)
-                    IMPLICIT NONE
-                    INTEGER,INTENT(IN) :: unitType
-                    CALL c_setReportUnits(unitType)
-                END SUBROUTINE SmartStack_setReportUnits
 
         END MODULE SMARTSTACKMODULE
