@@ -35,9 +35,11 @@ void printCurrentStackFtn();
 void printCurrentStackMessageFtn(const char *message);
 void printCurrentFunctionFtn();
 void printCurrentFunctionMessageFtn(const char *message);
-void printTimingReportFtn(int sortType = 20000, int sortOrder = 10001);
-void saveTimingReportFtn(char *filename, int sortType = 20000,
-                         int sortOrder = 10001, int format = 40000);
+void printTimingReportFtn(int reportUnits = 30001, int sortType = 20000,
+                          int sortOrder = 10001);
+void saveTimingReportFtn(char *filename, int reportUnits = 30001,
+                         int sortType = 20000, int sortOrder = 10001,
+                         int format = 40000);
 void getCurrentStackFtn();
 void getCurrentFunctionFtn();
 
@@ -113,23 +115,21 @@ void getCurrentFunctionFtn() {
   return;
 }
 
-void printTimingReportFtn(int sortType, int sortOrder) {
+void printTimingReportFtn(int reportUnits, int sortType, int sortOrder) {
   SmartStack::Report::SortType c_sortType = c_sortTypeList[sortType - 20000];
   SmartStack::Report::SortOrder c_sortOrder =
       c_sortOrderList[sortOrder - 10000];
-  SmartStack::Report::TimeUnits c_units =
-      SmartStack::Report::TimeUnits::Milliseconds;
+  SmartStack::Report::TimeUnits c_units = c_unitsList[reportUnits - 30000];
   SmartStack::printTimingReport(c_units, c_sortType, c_sortOrder);
 }
 
-void saveTimingReportFtn(char *filename, int sortType, int sortOrder,
-                         int format) {
+void saveTimingReportFtn(char *filename, int reportUnits, int sortType,
+                         int sortOrder, int format) {
   SmartStack::Report::SortType c_sortType = c_sortTypeList[sortType - 20000];
   SmartStack::Report::SortOrder c_sortOrder =
       c_sortOrderList[sortOrder - 10000];
   SmartStack::Report::OutputFormat c_format = c_outputFormat[format - 40000];
-  SmartStack::Report::TimeUnits c_units =
-      SmartStack::Report::TimeUnits::Milliseconds;
+  SmartStack::Report::TimeUnits c_units = c_unitsList[reportUnits - 30000];
   SmartStack::saveTimingReport(filename, c_units, c_sortType, c_sortOrder,
                                c_format);
 }

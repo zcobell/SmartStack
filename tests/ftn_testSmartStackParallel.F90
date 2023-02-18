@@ -10,8 +10,7 @@
                 TYPE(SMARTSTACK),ALLOCATABLE :: ss
                 CHARACTER(200) :: fn
                 CHARACTER(10)  :: fn2
-                ss = SmartStack("Smart1",.TRUE.)
-                ss%initialize = .TRUE.
+                ss = addSmartStack("Smart1")
                 CALL SmartStack_getCurrentFunction(fn)
                 WRITE(*,'(2A)') "Manually getting current function name: ",TRIM(fn)
                 CALL SmartStack_getCurrentStack(fn2)
@@ -25,8 +24,7 @@
                 TYPE(SMARTSTACK),ALLOCATABLE :: ss
                 CHARACTER(200) :: fn
                 CHARACTER(10)  :: fn2
-                ss = SmartStack("Smart2",.TRUE.)
-                ss%initialize = .TRUE.
+                ss = addSmartStack("Smart2")
                 CALL SmartStack_getCurrentStack(fn)
                 WRITE(*,'(2A)') "Manually getting current stack: ",TRIM(fn)
                 CALL SmartStack_getCurrentStack(fn2)
@@ -43,8 +41,7 @@
             TYPE(SMARTSTACK),ALLOCATABLE :: ss
 
             CALL SmartStack_StartSession("TestSession",245,.TRUE.,"proc256.log")
-            ss = SmartStack("MAIN")
-            ss%initialize = .TRUE.
+            ss = addSmartStack("MAIN")
 
             CALL SMART1()
             CALL SMART1()

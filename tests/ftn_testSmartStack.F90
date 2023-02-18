@@ -9,9 +9,8 @@
                 IMPLICIT NONE
                 TYPE(SMARTSTACK),ALLOCATABLE :: ss
                 CHARACTER(200) :: fn
-                CHARACTER(10)  :: fn2
-                ss = SmartStack("Smart1_AVeryLongFunctionName",.TRUE.)
-                ss%initialize = .TRUE.
+                CHARACTER(50)  :: fn2
+                ss = addSmartStack("Smart1")
                 CALL SmartStack_getCurrentFunction(fn)
                 WRITE(*,'(2A)') "Manually getting current function name: ",TRIM(fn)
                 CALL SmartStack_getCurrentStack(fn2)
@@ -24,9 +23,10 @@
                 IMPLICIT NONE
                 TYPE(SMARTSTACK),ALLOCATABLE :: ss
                 CHARACTER(200) :: fn
-                CHARACTER(10)  :: fn2
-                ss = SmartStack("Smart2",.TRUE.)
-                ss%initialize = .TRUE.
+                CHARACTER(50)  :: fn2
+
+                ss = addSmartStack("Smart2")
+
                 CALL SmartStack_getCurrentStack(fn)
                 WRITE(*,'(2A)') "Manually getting current stack: ",TRIM(fn)
                 CALL SmartStack_getCurrentStack(fn2)
@@ -43,8 +43,7 @@
             TYPE(SMARTSTACK),ALLOCATABLE :: ss
 
             CALL SmartStack_StartSession("TestSession")
-            ss = SmartStack("MAIN")
-            ss%initialize = .TRUE.
+            ss = addSmartStack("Main")
 
             CALL SMART1()
             CALL SMART1()
@@ -54,9 +53,11 @@
 
             CALL SmartStack_printTimingReport()
 
-            CALL SmartStack_printTimingReport(SMARTSTACK_SORTCALLS,SMARTSTACK_SORTASCENDING)
-
-            CALL SmartStack_saveTimingReport("report.txt",SmartStack_SortCalls,SmartStack_SortAscending)
-            CALL SmartStack_saveTimingReport("report.csv",SmartStack_SortCalls,SmartStack_SortAscending,SmartStack_CSV)
+            CALL SmartStack_printTimingReport(SmartStack_Microseconds,&
+                        SMARTSTACK_SORTCALLS,SMARTSTACK_SORTASCENDING)
+            CALL SmartStack_saveTimingReport("report.txt",SmartStack_Milliseconds, &
+                        SmartStack_SortCalls,SmartStack_SortAscending)
+            CALL SmartStack_saveTimingReport("report.csv",SmartStack_Seconds,&
+                        SmartStack_SortCalls,SmartStack_SortAscending,SmartStack_CSV)
 
         END PROGRAM smartstack_test

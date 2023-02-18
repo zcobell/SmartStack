@@ -21,7 +21,7 @@
             INTEGER,PARAMETER :: SMARTSTACK_CSV           = 40001
 
             TYPE SMARTSTACK
-                LOGICAL,PUBLIC      :: initialize = .TRUE.
+                LOGICAL,PRIVATE     :: initialize = .TRUE.
                 TYPE(C_PTR),PRIVATE :: ptr
                 CONTAINS
                     FINAL                 :: destructor
@@ -94,19 +94,21 @@
                     CHARACTER(KIND=C_CHAR),INTENT(IN) :: message
                 END SUBROUTINE c_printCurrentFunctionMessage
 
-                SUBROUTINE c_printTimingReport(SORT_TYPE,SORT_ORDER) &
+                SUBROUTINE c_printTimingReport(REPORT_UNITS, SORT_TYPE,SORT_ORDER) &
                         BIND(C,NAME="printTimingReportFtn")
                     USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT
                     IMPLICIT NONE
+                    INTEGER(KIND=C_INT),VALUE :: REPORT_UNITS
                     INTEGER(KIND=C_INT),VALUE :: SORT_TYPE
                     INTEGER(KIND=C_INT),VALUE :: SORT_ORDER
                 END SUBROUTINE c_printTimingReport
 
-                SUBROUTINE c_saveTimingReport(FILENAME,SORT_TYPE,SORT_ORDER,OUTPUT_FORMAT) &
+                SUBROUTINE c_saveTimingReport(FILENAME,REPORT_UNITS,SORT_TYPE,SORT_ORDER,OUTPUT_FORMAT) &
                         BIND(C,NAME="saveTimingReportFtn")
                     USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_CHAR,C_INT
                     IMPLICIT NONE
                     CHARACTER(KIND=C_CHAR),INTENT(IN)    :: FILENAME
+                    INTEGER(KIND=C_INT),INTENT(IN),VALUE :: REPORT_UNITS
                     INTEGER(KIND=C_INT),INTENT(IN),VALUE :: SORT_TYPE
                     INTEGER(KIND=C_INT),INTENT(IN),VALUE :: SORT_ORDER
                     INTEGER(KIND=C_INT),INTENT(IN),VALUE :: OUTPUT_FORMAT
@@ -126,7 +128,18 @@
             CHARACTER(:),ALLOCATABLE,PRIVATE :: c_string_buffer
             INTEGER,PRIVATE                  :: c_string_length
 
+            PRIVATE init_t, constructor, destructor
+
             CONTAINS
+
+                FUNCTION addSmartStack(function_name) RESULT(newStack)
+                    USE,INTRINSIC                   :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_NULL_CHAR
+                    IMPLICIT NONE
+                    CHARACTER(*),INTENT(IN)         :: function_name
+                    TYPE(SMARTSTACK),ALLOCATABLE    :: newStack
+                    newStack = SMARTSTACK(function_name)
+                    newStack%initialize = .TRUE.
+                END FUNCTION addSmartStack
 
                 SUBROUTINE c2f_copyStringToFortran(c_string,c_string_len) BIND(C,NAME="c2f_copyStringToFortran")
                     USE,INTRINSIC                        :: ISO_C_BINDING,ONLY:C_CHAR,C_INT
@@ -231,7 +244,7 @@
                     IMPLICIT NONE
                     CHARACTER(*),INTENT(OUT) :: buffer
                     CALL c_getCurrentStack()
-                    IF(LEN(buffer).LT.LEN(c_string_buffer))THEN
+                    IF(LEN(buffer)<LEN(c_string_buffer))THEN
                         WRITE(*,'(A)') "SmartStack Error: String buffer overflow detected."//&
                                        " Increase buffer size"
                         buffer = ""
@@ -245,7 +258,7 @@
                     IMPLICIT NONE
                     CHARACTER(*),INTENT(OUT) :: buffer
                     CALL c_getCurrentFunction()
-                    IF(LEN(buffer).LT.LEN(c_string_buffer))THEN
+                    IF(LEN(buffer)<LEN(c_string_buffer))THEN
                         WRITE(*,'(A)') "SmartStack Error: String buffer overflow detected."//&
                                        " Increase buffer size"
                         buffer = ""
@@ -255,12 +268,19 @@
                     DEALLOCATE(c_string_buffer)
                 END SUBROUTINE SmartStack_getCurrentFunction
 
-                SUBROUTINE SmartStack_printTimingReport(SORT_TYPE,SORT_ORDER)
+                SUBROUTINE SmartStack_printTimingReport(REPORT_UNITS,SORT_TYPE,SORT_ORDER)
                     IMPLICIT NONE
+                    INTEGER,OPTIONAL,INTENT(IN) :: REPORT_UNITS
                     INTEGER,OPTIONAL,INTENT(IN) :: SORT_TYPE
                     INTEGER,OPTIONAL,INTENT(IN) :: SORT_ORDER
+                    INTEGER                     :: F_REPORT_UNITS
                     INTEGER                     :: F_SORT_TYPE
                     INTEGER                     :: F_SORT_ORDER
+                    IF(PRESENT(REPORT_UNITS))THEN
+                        F_REPORT_UNITS = REPORT_UNITS
+                    ELSE
+                        F_REPORT_UNITS = SMARTSTACK_MILLISECONDS
+                    ENDIF
                     IF(PRESENT(SORT_TYPE))THEN
                         F_SORT_TYPE = SORT_TYPE
                     ELSE
@@ -271,19 +291,26 @@
                     ELSE
                         F_SORT_ORDER = SMARTSTACK_SORTDECENDING
                     ENDIF
-                    CALL c_printTimingReport(F_SORT_TYPE,F_SORT_ORDER)
+                    CALL c_printTimingReport(F_REPORT_UNITS,F_SORT_TYPE,F_SORT_ORDER)
                 END SUBROUTINE SmartStack_printTimingReport
 
-                SUBROUTINE SmartStack_saveTimingReport(FILENAME,SORT_TYPE,SORT_ORDER,OUTPUT_FORMAT)
+                SUBROUTINE SmartStack_saveTimingReport(FILENAME,REPORT_UNITS,SORT_TYPE,SORT_ORDER,OUTPUT_FORMAT)
                     USE,INTRINSIC    :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_NULL_CHAR
                     IMPLICIT NONE
                     CHARACTER(*),INTENT(IN)     :: FILENAME
+                    INTEGER,OPTIONAL,INTENT(IN) :: REPORT_UNITS
                     INTEGER,OPTIONAL,INTENT(IN) :: SORT_TYPE
                     INTEGER,OPTIONAL,INTENT(IN) :: SORT_ORDER
                     INTEGER,OPTIONAL,INTENT(IN) :: OUTPUT_FORMAT
+                    INTEGER                     :: F_REPORT_UNITS
                     INTEGER                     :: F_SORT_TYPE
                     INTEGER                     :: F_SORT_ORDER
                     INTEGER                     :: F_OUTPUT_FORMAT
+                    IF(PRESENT(REPORT_UNITS))THEN
+                        F_REPORT_UNITS = REPORT_UNITS
+                    ELSE
+                        F_REPORT_UNITS = SMARTSTACK_MILLISECONDS
+                    ENDIF
                     IF(PRESENT(SORT_TYPE))THEN
                         F_SORT_TYPE = SORT_TYPE
                     ELSE
@@ -299,7 +326,7 @@
                     ELSE
                         F_OUTPUT_FORMAT = SMARTSTACK_TABLE
                     ENDIF
-                    CALL c_saveTimingReport(FILENAME//C_NULL_CHAR,F_SORT_TYPE,F_SORT_ORDER,F_OUTPUT_FORMAT)
+                    CALL c_saveTimingReport(FILENAME//C_NULL_CHAR,F_REPORT_UNITS,F_SORT_TYPE,F_SORT_ORDER,F_OUTPUT_FORMAT)
                 END SUBROUTINE SmartStack_saveTimingReport
 
         END MODULE SMARTSTACKMODULE
