@@ -7,6 +7,9 @@
 #include <fstream>
 #include <iostream>
 
+#define FMT_HEADER_ONLY
+#include "fmt/core.h"
+
 using namespace SmartStack;
 
 Report::Report(const std::string &sessionName, const Report::TimeUnits &units,
@@ -227,7 +230,7 @@ void Report::saveTableTimingReport(const std::vector<Function *> &functions,
 std::string Report::getFunctionReportLine(
     size_t i, Function *f, const size_t function_name_max_length,
     const Report::TimeUnits &units, const Report::OutputFormat &format) const {
-  char line[400];
+  std::string line;
   if (units == Seconds || units == Hours || units == Minutes ||
       units == Milliseconds) {
     const double multiplier = [](const Report::TimeUnits &units) {
@@ -254,37 +257,32 @@ std::string Report::getFunctionReportLine(
         Report::convertTimeUnitsDouble(f->meanGlobalDuration(), multiplier);
 
     if (format == Report::Table) {
-      std::string formatLine =
-          std::string() + "| %8zu | %" +
-          formatStringChar(function_name_max_length) +
-          "s | %11lld |            %9.9e |               %9.9e |       "
-          "           %9.9e |                      %9.9e |";
-
-      snprintf(line, 400, formatLine.c_str(), i, f->name().c_str(),
-               f->numCalls(), ts, mts, ats, amts);
+      line = fmt::format(
+          "| {:8d} | {:" + std::to_string(function_name_max_length) +
+              "s} | {:11d} |            {:9.9e} |               {:9.9e} | "
+              "                 {:9.9e} |                      {:9.9e} |",
+          i, f->name(), f->numCalls(), ts, mts, ats, amts);
     } else {
-      snprintf(line, 400, "%zu,%s,%lld,%9.9e,%9.9e,%9.9e,%9.9e", i,
-               f->name().c_str(), f->numCalls(), ts, mts, ats, amts);
+      line = fmt::format("{:d},{:s},{:d},{:9.9e},{:9.9e},{:9.9e},{:9.9e}", i,
+                         f->name().c_str(), f->numCalls(), ts, mts, ats, amts);
     }
   } else {
     if (format == Report::Table) {
-      std::string formatLine =
-          std::string() + "| %8zu | %" +
-          formatStringChar(function_name_max_length) +
-          "s | %11lld |         %18lld |            %18lld "
-          "|               %18lld |  "
-          "                 %18lld |";
-      snprintf(line, 400, formatLine.c_str(), i, f->name().c_str(),
-               f->numCalls(), f->timer()->elapsed(), f->meanDuration(),
-               f->timer()->globalElapsed(), f->meanGlobalDuration());
+      line = fmt::format(
+          "| {:8d} | {:" + std::to_string(function_name_max_length) +
+              "s} | {:11d} | {:26d} | "
+              "{:29d} | {:32d} | {:36d} |",
+          i, f->name().c_str(), f->numCalls(), f->timer()->elapsed(),
+          f->meanDuration(), f->timer()->globalElapsed(),
+          f->meanGlobalDuration());
     } else {
-      snprintf(line, 400, "%zu,%s,%lld,%lld,%lld,%lld,%lld", i,
-               f->name().c_str(), f->numCalls(), f->timer()->elapsed(),
-               f->meanDuration(), f->timer()->globalElapsed(),
-               f->meanGlobalDuration());
+      line = fmt::format("{:d},{:s},{:d},{:d},{:d},{:d},{:d}", i,
+                         f->name().c_str(), f->numCalls(),
+                         f->timer()->elapsed(), f->meanDuration(),
+                         f->timer()->globalElapsed(), f->meanGlobalDuration());
     }
   }
-  return {line};
+  return line;
 }
 
 double Report::convertTimeUnitsDouble(const size_t time,
@@ -303,15 +301,6 @@ size_t Report::maxNumFunctionChars(const std::vector<Function *> &functions,
   if (mx % 2 == 0)
     return mx;
   return mx + 1;
-}
-
-std::string Report::formatStringChar(size_t n) {
-  char line[20];
-  if (n == 13)
-    snprintf(line, 20, "%zu", n + 1);
-  else
-    snprintf(line, 20, "%zu", n);
-  return {line};
 }
 
 void Report::setSortType(const Report::SortType &st) { m_sortType = st; }

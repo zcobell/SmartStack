@@ -213,8 +213,9 @@ endif()
 
 set(HEADER_LIST ${CMAKE_SOURCE_DIR}/libsmartstack/smartstack.h)
 
-target_include_directories(smartstack
-                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack)
+target_include_directories(smartstack PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack
+        ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fmt/include)
 
 target_compile_definitions(smartstack PRIVATE GIT_VERSION="${GIT_VERSION}")
 target_compile_definitions(smartstack PRIVATE SMARTSTACK_LIBRARY)
