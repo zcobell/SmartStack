@@ -42,12 +42,9 @@ int main(int argv, char **argc) {
 
 void doSomething() {
   ADD_SMARTSTACK("doSomething")
-
   usleep(500);
   doSomethingElse();
   doSomethingElse();
-
-  return;
 }
 
 void doSomethingElse() {

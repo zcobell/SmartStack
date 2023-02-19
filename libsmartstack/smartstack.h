@@ -23,7 +23,7 @@
 #include <string>
 
 #include "instrumentation.h"
-#include "smartstack_global.h"
+#include "report.h"
 
 #define ADD_SMARTSTACK(fname)                                                  \
   SmartStack::Instrumentation __SmartStackInstrument =                         \
@@ -58,7 +58,7 @@ void printFunction(const std::string &message = std::string()) {
 }
 
 void printTimingReport(
-    Report::TimeUnits timeUnits = Report::TimeUnits::Milliseconds,
+    SmartStack::Report::TimeUnits timeUnits = Report::TimeUnits::Milliseconds,
     Report::SortType sortType = Report::SortType::Time,
     Report::SortOrder sortOrder = Report::SortOrder::Descending) {
   Report report(Stack::sessionName(), timeUnits, sortType, sortOrder);
@@ -68,7 +68,7 @@ void printTimingReport(
 
 void saveTimingReport(
     const std::string &filename,
-    Report::TimeUnits timeUnits = Report::TimeUnits::Milliseconds,
+    SmartStack::Report::TimeUnits timeUnits = Report::TimeUnits::Milliseconds,
     SmartStack::Report::SortType sortType = SmartStack::Report::SortType::Time,
     SmartStack::Report::SortOrder sortOrder =
         SmartStack::Report::SortOrder::Descending,

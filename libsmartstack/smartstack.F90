@@ -114,15 +114,6 @@
                     INTEGER(KIND=C_INT),INTENT(IN),VALUE :: OUTPUT_FORMAT
                 END SUBROUTINE c_saveTimingReport
 
-                SUBROUTINE c_getCurrentStack() BIND(C,NAME="getCurrentStackFtn")
-                    IMPLICIT NONE
-                END SUBROUTINE c_getCurrentStack
-
-                SUBROUTINE c_getCurrentFunction() BIND(C,NAME="getCurrentFunctionFtn")
-                    IMPLICIT NONE
-                END SUBROUTINE c_getCurrentFunction
-
-
             END INTERFACE
 
             CHARACTER(:),ALLOCATABLE,PRIVATE :: c_string_buffer
@@ -239,34 +230,6 @@
                         CALL c_printCurrentFunction()
                     ENDIF
                 END SUBROUTINE SmartStack_printCurrentFunction
-
-                SUBROUTINE SmartStack_getCurrentStack(buffer)
-                    IMPLICIT NONE
-                    CHARACTER(*),INTENT(OUT) :: buffer
-                    CALL c_getCurrentStack()
-                    IF(LEN(buffer)<LEN(c_string_buffer))THEN
-                        WRITE(*,'(A)') "SmartStack Error: String buffer overflow detected."//&
-                                       " Increase buffer size"
-                        buffer = ""
-                        RETURN
-                    ENDIF
-                    buffer = c_string_buffer
-                    DEALLOCATE(c_string_buffer)
-                END SUBROUTINE SmartStack_getCurrentStack
-
-                SUBROUTINE SmartStack_getCurrentFunction(buffer)
-                    IMPLICIT NONE
-                    CHARACTER(*),INTENT(OUT) :: buffer
-                    CALL c_getCurrentFunction()
-                    IF(LEN(buffer)<LEN(c_string_buffer))THEN
-                        WRITE(*,'(A)') "SmartStack Error: String buffer overflow detected."//&
-                                       " Increase buffer size"
-                        buffer = ""
-                        RETURN
-                    ENDIF
-                    buffer = c_string_buffer
-                    DEALLOCATE(c_string_buffer)
-                END SUBROUTINE SmartStack_getCurrentFunction
 
                 SUBROUTINE SmartStack_printTimingReport(REPORT_UNITS,SORT_TYPE,SORT_ORDER)
                     IMPLICIT NONE

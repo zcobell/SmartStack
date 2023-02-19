@@ -193,6 +193,7 @@ set(SMARTSTACK_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/timer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/function.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/report.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/stackimpl.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/stack.cpp)
 
 

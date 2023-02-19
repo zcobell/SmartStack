@@ -40,10 +40,6 @@ void printTimingReportFtn(int reportUnits = 30001, int sortType = 20000,
 void saveTimingReportFtn(char *filename, int reportUnits = 30001,
                          int sortType = 20000, int sortOrder = 10001,
                          int format = 40000);
-void getCurrentStackFtn();
-void getCurrentFunctionFtn();
-
-void c2f_copyStringToFortran(const char *, int n);
 }
 
 constexpr std::array<SmartStack::Report::SortType, 3> c_sortTypeList = {
@@ -101,18 +97,6 @@ void printCurrentFunctionFtn() { SmartStack::printFunction(); }
 
 void printCurrentFunctionMessageFtn(const char *message) {
   SmartStack::printFunction(message);
-}
-
-void getCurrentStackFtn() {
-  std::string s = SmartStack::getCurrentStack();
-  c2f_copyStringToFortran(s.c_str(), s.size());
-  return;
-}
-
-void getCurrentFunctionFtn() {
-  std::string s = SmartStack::getCurrentFunction();
-  c2f_copyStringToFortran(s.c_str(), s.size());
-  return;
 }
 
 void printTimingReportFtn(int reportUnits, int sortType, int sortOrder) {
