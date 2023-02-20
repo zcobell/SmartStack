@@ -1,3 +1,4 @@
+#include "smartstackf.h"
 
         MODULE sample
             USE SMARTSTACKMODULE
@@ -7,11 +8,9 @@
 
             SUBROUTINE Smart1
                 IMPLICIT NONE
-                TYPE(SMARTSTACK),ALLOCATABLE :: ss
                 CHARACTER(200) :: fn
-                CHARACTER(10)  :: fn2
-                ss = SmartStack("Smart1_AVeryLongFunctionName",.TRUE.)
-                ss%initialize = .TRUE.
+                CHARACTER(50)  :: fn2
+                ADD_SMARTSTACK("Smart1",.TRUE.)
                 CALL SmartStack_getCurrentFunction(fn)
                 WRITE(*,'(2A)') "Manually getting current function name: ",TRIM(fn)
                 CALL SmartStack_getCurrentStack(fn2)
@@ -24,9 +23,8 @@
                 IMPLICIT NONE
                 TYPE(SMARTSTACK),ALLOCATABLE :: ss
                 CHARACTER(200) :: fn
-                CHARACTER(10)  :: fn2
-                ss = SmartStack("Smart2",.TRUE.)
-                ss%initialize = .TRUE.
+                CHARACTER(50)  :: fn2
+                ADD_SMARTSTACK("Smart2", .TRUE.)
                 CALL SmartStack_getCurrentStack(fn)
                 WRITE(*,'(2A)') "Manually getting current stack: ",TRIM(fn)
                 CALL SmartStack_getCurrentStack(fn2)
@@ -40,11 +38,7 @@
         PROGRAM smartstack_test
             USE sample
             IMPLICIT NONE
-            TYPE(SMARTSTACK),ALLOCATABLE :: ss
-
-            CALL SmartStack_StartSession("TestSession")
-            ss = SmartStack("MAIN")
-            ss%initialize = .TRUE.
+            START_SMARTSTACK("TEST_SESSION", "MAIN", .TRUE.)
 
             CALL SMART1()
             CALL SMART1()
