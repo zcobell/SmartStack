@@ -14,9 +14,13 @@
 using namespace SmartStack::Stack::detail;
 
 StackImpl::StackImpl(size_t reserve)
-    : m_procid(-1), m_logfile(std::string()), m_procString(std::string()),
-      m_started(false), m_firstProfile(true), m_logToFile(false),
-      m_proc0toScreen(false) {
+    : m_procid(-1),
+      m_started(false),
+      m_logToFile(false),
+      m_proc0toScreen(false),
+      m_sessionName("default"),
+      m_logfile(std::string()),
+      m_procString(std::string()) {
   if (reserve > 0) {
     this->m_functionStack.reserve(reserve);
     this->m_functions.reserve(reserve);
@@ -54,7 +58,7 @@ void StackImpl::startSession(const std::string &session, int procid,
 }
 
 void StackImpl::endSession() {
-  for (auto &f : this->m_functions) {
+  for (auto &f: this->m_functions) {
     if (f->running()) {
       f->endFunction();
     }
@@ -115,7 +119,7 @@ std::string StackImpl::getCurrentStack(const std::string &message) const {
   } else {
     s = "[" + this->m_sessionName + " " + this->m_procString + "]: ";
   }
-  for (const auto &f : this->m_functionStack) {
+  for (const auto &f: this->m_functionStack) {
     if (!first) {
       s += " --> " + f->name();
     } else {

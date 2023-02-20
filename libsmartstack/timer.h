@@ -28,17 +28,17 @@ public:
   void stopClock();
   void pause();
   void restart();
-  [[nodiscard]] size_t elapsed() const;
-  [[nodiscard]] size_t globalElapsed() const;
-  [[nodiscard]] size_t startTime() const;
-  [[nodiscard]] size_t endTime() const;
-  [[nodiscard]] size_t lastElapsed() const;
+  [[nodiscard]] long long elapsed() const;
+  [[nodiscard]] long long globalElapsed() const;
+  [[nodiscard]] long long startTime() const;
+  [[nodiscard]] long long endTime() const;
+  [[nodiscard]] long long lastElapsed() const;
   [[nodiscard]] bool running() const;
 
 private:
-  size_t m_totalElapsed;
-  size_t m_lastElapsed;
-  size_t m_totalGlobalElapsed;
+  long long m_totalElapsed;
+  long long m_lastElapsed;
+  long long m_totalGlobalElapsed;
   bool m_running;
   std::chrono::high_resolution_clock::time_point m_startLocal;
   std::chrono::high_resolution_clock::time_point m_endLocal;

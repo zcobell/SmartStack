@@ -17,8 +17,6 @@
 // along with SmartStack.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------//
 #include <array>
-#include <cstring>
-#include <iostream>
 #include <memory>
 
 #include "smartstack.h"
@@ -72,13 +70,13 @@ void endSessionFtn() { SmartStack::endSession(); }
 void *addSmartStackFtn(char *functionName) {
   SmartStack::Instrumentation *s =
       new SmartStack::Instrumentation(functionName);
-  return (void *)s;
+  return static_cast<void *>(s);
 }
 
 void *addSmartStackShowFtn(char *functionName) {
   SmartStack::Instrumentation *s =
       new SmartStack::Instrumentation(functionName, true);
-  return (void *)s;
+  return static_cast<void *>(s);
 }
 
 void deleteSmartStackFtn(void *ptr) {
@@ -100,20 +98,25 @@ void printCurrentFunctionMessageFtn(const char *message) {
 }
 
 void printTimingReportFtn(int reportUnits, int sortType, int sortOrder) {
-  SmartStack::Report::SortType c_sortType = c_sortTypeList[sortType - 20000];
-  SmartStack::Report::SortOrder c_sortOrder =
-      c_sortOrderList[sortOrder - 10000];
-  SmartStack::Report::TimeUnits c_units = c_unitsList[reportUnits - 30000];
+  const size_t sort = static_cast<size_t>(sortType - 20000);
+  const size_t order = static_cast<size_t>(sortOrder - 10000);
+  const size_t units = static_cast<size_t>(reportUnits - 30000);
+  SmartStack::Report::SortType c_sortType = c_sortTypeList[sort];
+  SmartStack::Report::SortOrder c_sortOrder = c_sortOrderList[order];
+  SmartStack::Report::TimeUnits c_units = c_unitsList[units];
   SmartStack::printTimingReport(c_units, c_sortType, c_sortOrder);
 }
 
 void saveTimingReportFtn(char *filename, int reportUnits, int sortType,
                          int sortOrder, int format) {
-  SmartStack::Report::SortType c_sortType = c_sortTypeList[sortType - 20000];
-  SmartStack::Report::SortOrder c_sortOrder =
-      c_sortOrderList[sortOrder - 10000];
-  SmartStack::Report::OutputFormat c_format = c_outputFormat[format - 40000];
-  SmartStack::Report::TimeUnits c_units = c_unitsList[reportUnits - 30000];
+  const size_t sort = static_cast<size_t>(sortType - 20000);
+  const size_t order = static_cast<size_t>(sortOrder - 10000);
+  const size_t units = static_cast<size_t>(reportUnits - 30000);
+  const size_t fmt = static_cast<size_t>(format - 40000);
+  SmartStack::Report::SortType c_sortType = c_sortTypeList[sort];
+  SmartStack::Report::SortOrder c_sortOrder = c_sortOrderList[order];
+  SmartStack::Report::OutputFormat c_format = c_outputFormat[fmt];
+  SmartStack::Report::TimeUnits c_units = c_unitsList[units];
   SmartStack::saveTimingReport(filename, c_units, c_sortType, c_sortOrder,
                                c_format);
 }

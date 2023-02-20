@@ -40,13 +40,13 @@ public:
 
   std::string name() const;
 
-  size_t numCalls() const;
+  long long numCalls() const;
 
   bool running() const;
 
 private:
   std::string m_name;
-  size_t m_ncall;
+  long long m_ncall;
   mutable Timer m_timer;
 };
 

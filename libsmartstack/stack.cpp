@@ -92,7 +92,7 @@ std::string SmartStack::Stack::sessionName() {
 
 std::vector<Function *> SmartStack::Stack::getFunctionList() {
   std::vector<Function *> f;
-  for (auto &i : SmartStack::Stack::detail::instance()->functions()) {
+  for (auto &i: SmartStack::Stack::detail::instance()->functions()) {
     f.push_back(i.get());
   }
   return f;

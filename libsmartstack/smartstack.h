@@ -25,8 +25,8 @@
 #include "instrumentation.h"
 #include "report.h"
 
-#define ADD_SMARTSTACK(fname)                                                  \
-  SmartStack::Instrumentation __SmartStackInstrument =                         \
+#define ADD_SMARTSTACK(fname)                          \
+  SmartStack::Instrumentation __SmartStackInstrument = \
       SmartStack::addInstrumentation(fname);
 
 #ifdef __func__
@@ -39,32 +39,22 @@
 
 namespace SmartStack {
 
-bool sessionStarted() { return SmartStack::Stack::sessionStarted(); }
+bool sessionStarted();
 
 void startSession(const std::string &sessionName, const int &procid = -1,
                   const bool proc0ToScreen = false,
-                  const std::string &logfile = std::string()) {
-  SmartStack::Stack::startSession(sessionName, procid, proc0ToScreen, logfile);
-}
+                  const std::string &logfile = std::string());
 
-void endSession() { SmartStack::Stack::endSession(); }
+void endSession();
 
-void printStack(const std::string &message = std::string()) {
-  SmartStack::Stack::printCurrentStack(message);
-}
+void printStack(const std::string &message = std::string());
 
-void printFunction(const std::string &message = std::string()) {
-  SmartStack::Stack::printCurrentFunction(message);
-}
+void printFunction(const std::string &message = std::string());
 
 void printTimingReport(
     SmartStack::Report::TimeUnits timeUnits = Report::TimeUnits::Milliseconds,
     Report::SortType sortType = Report::SortType::Time,
-    Report::SortOrder sortOrder = Report::SortOrder::Descending) {
-  Report report(Stack::sessionName(), timeUnits, sortType, sortOrder);
-  auto functions = SmartStack::Stack::getFunctionList();
-  report.printTimingReport(functions);
-}
+    Report::SortOrder sortOrder = Report::SortOrder::Descending);
 
 void saveTimingReport(
     const std::string &filename,
@@ -73,29 +63,15 @@ void saveTimingReport(
     SmartStack::Report::SortOrder sortOrder =
         SmartStack::Report::SortOrder::Descending,
     SmartStack::Report::OutputFormat format =
-        SmartStack::Report::OutputFormat::Table) {
-  auto functions = SmartStack::Stack::getFunctionList();
-  Report report(Stack::sessionName(), timeUnits, sortType, sortOrder);
-  if (format == SmartStack::Report::OutputFormat::Table) {
-    report.saveTableTimingReport(functions, filename);
-  } else if (format == SmartStack::Report::OutputFormat::CSV) {
-    report.saveCsvTimingReport(functions, filename);
-  } else {
-    throw std::runtime_error("Invalid output format");
-  }
-}
+        SmartStack::Report::OutputFormat::Table);
 
-std::string getCurrentStack() { return SmartStack::Stack::getCurrentStack(); }
+std::string getCurrentStack();
 
-std::string getCurrentFunction() {
-  return SmartStack::Stack::getCurrentFunction();
-}
+std::string getCurrentFunction();
 
 Instrumentation addInstrumentation(const std::string &functionName,
-                                   bool showStack = false) {
-  return SmartStack::Instrumentation(functionName, showStack);
-}
+                                   bool showStack = false);
 
-} // namespace SmartStack
+}  // namespace SmartStack
 
-#endif // SMARTSTACK_H
+#endif  // SMARTSTACK_H

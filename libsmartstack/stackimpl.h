@@ -50,7 +50,6 @@ public:
 private:
   int m_procid;
   bool m_started;
-  bool m_firstProfile;
   bool m_logToFile;
   bool m_proc0toScreen;
   std::string m_sessionName;

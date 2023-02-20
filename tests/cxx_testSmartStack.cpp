@@ -23,7 +23,9 @@
 void doSomething();
 void doSomethingElse();
 
-int main(int argv, char **argc) {
+int main(__attribute__((unused)) int argv, __attribute__((unused))char **argc) {
+
+
   SmartStack::startSession("ADCIRC");
 
   ADD_SMARTSTACK("main");

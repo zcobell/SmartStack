@@ -43,7 +43,7 @@ void Function::endFunction() { this->m_timer.stopClock(); }
 
 std::string Function::name() const { return this->m_name; }
 
-size_t Function::numCalls() const { return this->m_ncall; }
+long long Function::numCalls() const { return this->m_ncall; }
 
 Timer *Function::timer() const { return &this->m_timer; }
 

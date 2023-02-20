@@ -3,6 +3,7 @@
 //
 
 #include "report.h"
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -14,52 +15,54 @@ using namespace SmartStack;
 
 Report::Report(const std::string &sessionName, const Report::TimeUnits &units,
                const Report::SortType &st, const Report::SortOrder &so)
-    : m_sessionName(sessionName), m_reportUnits(units), m_sortOrder(so),
+    : m_sessionName(sessionName),
+      m_reportUnits(units),
+      m_sortOrder(so),
       m_sortType(st) {}
 
 void Report::setReportUnits(const Report::TimeUnits &units) {
   m_reportUnits = units;
 }
 
-std::vector<Function *>
-Report::sortFunctions(const std::vector<Function *> &functions) const {
+std::vector<Function *> Report::sortFunctions(
+    const std::vector<Function *> &functions) const {
   std::vector<Function *> sortedFunctions;
   sortedFunctions.reserve(functions.size());
   for (auto &f : functions) {
     sortedFunctions.push_back(f);
   }
   switch (m_sortType) {
-  case Time:
-    std::sort(sortedFunctions.begin(), sortedFunctions.end(),
-              [](const Function *a, const Function *b) {
-                return a->timer()->elapsed() > b->timer()->elapsed();
-              });
-    break;
-  case Calls:
-    std::sort(sortedFunctions.begin(), sortedFunctions.end(),
-              [](const Function *a, const Function *b) {
-                return a->numCalls() > b->numCalls();
-              });
-    break;
-  case MeanTime:
-    std::sort(sortedFunctions.begin(), sortedFunctions.end(),
-              [](const Function *a, const Function *b) {
-                return a->meanDuration() > b->meanDuration();
-              });
-    break;
-  case MeanTotalTime:
-    std::sort(sortedFunctions.begin(), sortedFunctions.end(),
-              [](const Function *a, const Function *b) {
-                return a->meanGlobalDuration() > b->meanGlobalDuration();
-              });
-    break;
-  case TotalTime:
-  default:
-    std::sort(sortedFunctions.begin(), sortedFunctions.end(),
-              [](const Function *a, const Function *b) {
-                return a->timer()->globalElapsed() >
-                       b->timer()->globalElapsed();
-              });
+    case Time:
+      std::sort(sortedFunctions.begin(), sortedFunctions.end(),
+                [](const Function *a, const Function *b) {
+                  return a->timer()->elapsed() > b->timer()->elapsed();
+                });
+      break;
+    case Calls:
+      std::sort(sortedFunctions.begin(), sortedFunctions.end(),
+                [](const Function *a, const Function *b) {
+                  return a->numCalls() > b->numCalls();
+                });
+      break;
+    case MeanTime:
+      std::sort(sortedFunctions.begin(), sortedFunctions.end(),
+                [](const Function *a, const Function *b) {
+                  return a->meanDuration() > b->meanDuration();
+                });
+      break;
+    case MeanTotalTime:
+      std::sort(sortedFunctions.begin(), sortedFunctions.end(),
+                [](const Function *a, const Function *b) {
+                  return a->meanGlobalDuration() > b->meanGlobalDuration();
+                });
+      break;
+    case TotalTime:
+    default:
+      std::sort(sortedFunctions.begin(), sortedFunctions.end(),
+                [](const Function *a, const Function *b) {
+                  return a->timer()->globalElapsed() >
+                         b->timer()->globalElapsed();
+                });
   }
 
   if (m_sortOrder == Descending) {
@@ -110,10 +113,9 @@ void Report::getSortCodes(std::string &calls, std::string &duration,
   }
 }
 
-std::vector<std::string>
-Report::generateTableTimingReport(const std::vector<Function *> &functions,
-                                  const SortType &st,
-                                  const SortOrder &so) const {
+std::vector<std::string> Report::generateTableTimingReport(
+    const std::vector<Function *> &functions, const SortType &st,
+    const SortOrder &so) const {
   auto sorted_functions = this->sortFunctions(functions);
   std::string callCode, durationCode, meanDurationCode, totalDurationCode,
       meanTotalDurationCode;
@@ -161,29 +163,31 @@ std::string Report::unitsString(const Report::TimeUnits &units,
                                 bool trim) const {
   if (!trim) {
     switch (units) {
-    case Microseconds:
-      return "(us)";
-    case Milliseconds:
-      return "(ms)";
-    case Seconds:
-      return "(s) ";
-    case Minutes:
-      return "(m) ";
-    case Hours:
-      return "(h) ";
+      case Microseconds:
+        return "(us)";
+      case Milliseconds:
+        return "(ms)";
+      case Minutes:
+        return "(m) ";
+      case Hours:
+        return "(h) ";
+      case Seconds:
+      default:
+        return "(s) ";
     }
   } else {
     switch (units) {
-    case Microseconds:
-      return "_us";
-    case Milliseconds:
-      return "_ms";
-    case Seconds:
-      return "_s";
-    case Minutes:
-      return "_m";
-    case Hours:
-      return "_h";
+      case Microseconds:
+        return "_us";
+      case Milliseconds:
+        return "_ms";
+      case Minutes:
+        return "_m";
+      case Hours:
+        return "_h";
+      case Seconds:
+      default:
+        return "_s";
     }
   }
   return "?";
@@ -233,18 +237,18 @@ std::string Report::getFunctionReportLine(
   std::string line;
   if (units == Seconds || units == Hours || units == Minutes ||
       units == Milliseconds) {
-    const double multiplier = [](const Report::TimeUnits &units) {
-      switch (units) {
-      case Seconds:
-        return 1e6;
-      case Minutes:
-        return 1e6 * 60.0;
-      case Hours:
-        return 1e6 * 60.0 * 60.0;
-      case Milliseconds:
-        return 1000.0;
-      default:
-        return 1.0;
+    const double multiplier = [](const Report::TimeUnits &u) {
+      switch (u) {
+        case Seconds:
+          return 1e6;
+        case Minutes:
+          return 1e6 * 60.0;
+        case Hours:
+          return 1e6 * 60.0 * 60.0;
+        case Milliseconds:
+          return 1000.0;
+        default:
+          return 1.0;
       }
     }(units);
 
@@ -285,7 +289,7 @@ std::string Report::getFunctionReportLine(
   return line;
 }
 
-double Report::convertTimeUnitsDouble(const size_t time,
+double Report::convertTimeUnitsDouble(const long long time,
                                       const double multiplier) {
   auto td = static_cast<double>(time);
   auto t = td / multiplier;
@@ -298,8 +302,7 @@ size_t Report::maxNumFunctionChars(const std::vector<Function *> &functions,
   for (auto &f : functions) {
     mx = std::max(mx, f->name().size());
   }
-  if (mx % 2 == 0)
-    return mx;
+  if (mx % 2 == 0) return mx;
   return mx + 1;
 }
 
