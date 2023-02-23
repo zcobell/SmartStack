@@ -21,21 +21,21 @@
 
 #include <chrono>
 
-#include "smartstack_global.h"
+namespace SmartStack::detail {
 
 class Timer {
  public:
-  SMARTSTACK_EXPORT Timer();
-  void SMARTSTACK_EXPORT startClock();
-  void SMARTSTACK_EXPORT stopClock();
-  void SMARTSTACK_EXPORT pause();
-  void SMARTSTACK_EXPORT restart();
-  long long SMARTSTACK_EXPORT elapsed() const;
-  long long SMARTSTACK_EXPORT globalElapsed() const;
-  long long SMARTSTACK_EXPORT startTime() const;
-  long long SMARTSTACK_EXPORT endTime() const;
-  long long SMARTSTACK_EXPORT lastElapsed() const;
-  bool SMARTSTACK_EXPORT running() const;
+  Timer();
+  void startClock();
+  void stopClock();
+  void pause();
+  void restart();
+  long long elapsed() const;
+  long long globalElapsed() const;
+  long long startTime() const;
+  long long endTime() const;
+  long long lastElapsed() const;
+  bool running() const;
 
  private:
   long long m_totalElapsed;
@@ -47,5 +47,6 @@ class Timer {
   std::chrono::high_resolution_clock::time_point m_startGlobal;
   std::chrono::high_resolution_clock::time_point m_endGlobal;
 };
+}  // namespace SmartStack::detail
 
 #endif  // TIMER_H

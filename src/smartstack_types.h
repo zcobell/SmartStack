@@ -1,0 +1,10 @@
+//
+// Created by zcobell on 2/23/23.
+//
+
+#ifndef SMARTSTACK_SMARTSTACK_TYPES_H
+#define SMARTSTACK_SMARTSTACK_TYPES_H
+
+
+
+#endif  // SMARTSTACK_SMARTSTACK_TYPES_H

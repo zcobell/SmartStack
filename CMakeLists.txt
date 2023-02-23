@@ -74,25 +74,24 @@ endif(COVERAGE)
 # ##############################################################################
 
 # ##############################################################################
-# C++ 11/14 Check
+# C++ 17/20 Check
 # ##############################################################################
 include(CheckCXXCompilerFlag)
-check_cxx_compiler_flag("-std=c++14" COMPILER_SUPPORTS_CXX14)
-if(COMPILER_SUPPORTS_CXX14)
-  set(CMAKE_CXX_STANDARD 14)
-  set(CMAKE_CXX_STANDARD_REQUIRED ON)
-else(COMPILER_SUPPORTS_CXX14)
-  check_cxx_compiler_flag("-std=c++11" COMPILER_SUPPORTS_CXX11)
-  if(COMPILER_SUPPORTS_CXX11)
-    set(CMAKE_CXX_STANDARD 11)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-  else(COMPILER_SUPPORTS_CXX11)
-    message(
-      FATAL_ERROR
-        "The compiler ${CMAKE_CXX_COMPILER} has no C++11/14 support. Please use a different C++ compiler."
-    )
-  endif(COMPILER_SUPPORTS_CXX11)
-endif(COMPILER_SUPPORTS_CXX14)
+include(CheckIncludeFileCXX)
+check_cxx_compiler_flag("-std=c++17" COMPILER_SUPPORTS_CXX17)
+check_cxx_compiler_flag("-std=c++20" COMPILER_SUPPORTS_CXX20)
+if(COMPILER_SUPPORTS_CXX20)
+  set(CMAKE_CXX_STANDARD 20)
+elseif(COMPILER_SUPPORTS_CXX17)
+  set(CMAKE_CXX_STANDARD 17)
+else(COMPILER_SUPPORTS_CXX20)
+  message(
+    FATAL_ERROR
+      "The compiler ${CMAKE_CXX_COMPILER} has no C++20 or C++17 support. Please use a different C++ compiler."
+  )
+endif(COMPILER_SUPPORTS_CXX20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+check_include_file_cxx("format" CXX_FORMAT_SUPPORT)
 # ##############################################################################
 
 # ##############################################################################
@@ -186,6 +185,9 @@ else(NOT CYGWIN)
 endif(NOT CYGWIN)
 # ##############################################################################
 
+# LIBFMT
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fmt)
+
 # ##############################################################################
 # SET THE LOCATION OF TEMPORARY STATIC LIBS
 # ##############################################################################
@@ -196,16 +198,18 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/CMakeFiles)
 # SmartStack Library
 # ##############################################################################
 set(SMARTSTACK_SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/timer.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/function.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/stack.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/timer.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/function.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/stack.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/report.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/stackimpl.cpp)
 
 
 if(SMARTSTACK_ENABLE_FORTRAN)
   set(SMARTSTACK_SOURCES
       ${SMARTSTACK_SOURCES}
-      ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/smartstackftn.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack/smartstack.F90)
+          ${CMAKE_CURRENT_SOURCE_DIR}/src/smartstackftn.cpp
+          ${CMAKE_CURRENT_SOURCE_DIR}/src/smartstack.F90 src/smartstack_types.h)
 endif(SMARTSTACK_ENABLE_FORTRAN)
 
 add_library(smartstack ${SMARTSTACK_LIBTYPE} ${SMARTSTACK_SOURCES})
@@ -216,10 +220,9 @@ if(SMARTSTACK_ENABLE_FORTRAN)
                           ${CMAKE_BINARY_DIR}/CMakeFiles/smartstack)
 endif()
 
-set(HEADER_LIST ${CMAKE_SOURCE_DIR}/libsmartstack/smartstack.h)
+set(HEADER_LIST ${CMAKE_SOURCE_DIR}/src/smartstack.h)
 
-target_include_directories(smartstack
-                           PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack)
+target_include_directories(smartstack PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 target_compile_definitions(smartstack PRIVATE GIT_VERSION="${GIT_VERSION}")
 target_compile_definitions(smartstack PRIVATE SMARTSTACK_LIBRARY)
@@ -262,8 +265,13 @@ endif(SMARTSTACK_BUILD_BENCHMARK)
 if(SMARTSTACK_USE_ABSEIL_FLAT_MAP)
   target_link_libraries(smartstack absl::flat_hash_map)
   add_dependencies(smartstack absl::flat_hash_map)
-  target_compile_definitions(smartstack PRIVATE USE_ABSEIL_FLAT_MAP)
+  target_compile_definitions(smartstack PRIVATE SMARTSTACK_USE_FLAT_MAP)
 endif(SMARTSTACK_USE_ABSEIL_FLAT_MAP)
+
+target_compile_definitions(smartstack PRIVATE "SMARTSTACK_USE_LIBFMT")
+target_include_directories(smartstack PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/fmt/include)
+target_link_libraries(smartstack fmt)
+add_dependencies(smartstack fmt)
 
 if(APPLE)
   set(CMAKE_MACOSX_RPATH 0)
@@ -285,7 +293,7 @@ if(SMARTSTACK_BUILD_TESTS)
     add_executable(${TESTNAME} ${CMAKE_SOURCE_DIR}/tests/${TESTFILE})
     add_dependencies(${TESTNAME} smartstack)
     target_include_directories(
-      ${TESTNAME} PRIVATE ${CMAKE_SOURCE_DIR}/libsmartstack
+      ${TESTNAME} PRIVATE ${CMAKE_SOURCE_DIR}/src
                           ${CMAKE_BINARY_DIR}/CMakeFiles/smartstack)
     add_dependencies(${TESTNAME} smartstack)
     target_link_libraries(${TESTNAME} smartstack)
@@ -320,10 +328,10 @@ endif(SMARTSTACK_BUILD_TESTS)
 
 if(SMARTSTACK_BUILD_BENCHMARK)
   add_executable(smartstack_benchmark ${CMAKE_SOURCE_DIR}/bench/main.cpp)
-  target_link_libraries(smartstack_benchmark smartstack benchmark pthread)
+  target_link_libraries(smartstack_benchmark smartstack fmt benchmark pthread)
   target_link_directories(smartstack_benchmark PRIVATE
                           ${GOOGLE_BENCHMARK_HOME}/lib)
   target_include_directories(
-    smartstack_benchmark PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/libsmartstack
+    smartstack_benchmark PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
                                  ${GOOGLE_BENCHMARK_HOME}/include)
 endif(SMARTSTACK_BUILD_BENCHMARK)

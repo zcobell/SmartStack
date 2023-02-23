@@ -1,7 +1,7 @@
 
 
         MODULE SMARTSTACKMODULE
-            USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_PTR
+            USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT
             IMPLICIT NONE
 
             INTEGER,PARAMETER :: SMARTSTACK_SORTASCENDING = 10000
@@ -22,7 +22,7 @@
 
             TYPE SMARTSTACK
                 LOGICAL,PUBLIC      :: initialize = .TRUE.
-                TYPE(C_PTR),PRIVATE :: ptr
+                INTEGER(C_INT),PRIVATE :: ptr
                 CONTAINS
                     FINAL                 :: destructor
                     PROCEDURE, PASS(THIS) :: init => init_t
@@ -33,28 +33,28 @@
             END INTERFACE SMARTSTACK
 
             INTERFACE
-                TYPE(C_PTR) FUNCTION c_createSmartStack(functionName) &
+                INTEGER(C_INT) FUNCTION c_createSmartStack(functionName) &
                         BIND(C,NAME="addSmartStackFtn") RESULT(ptr)
-                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT,C_CHAR
                     IMPLICIT NONE
                     CHARACTER(KIND=C_CHAR),INTENT(IN) :: functionName
                 END FUNCTION c_createSmartStack
 
-                TYPE(C_PTR) FUNCTION c_createSmartStackShowTrace(functionName) &
+                INTEGER(C_INT) FUNCTION c_createSmartStackShowTrace(functionName) &
                         BIND(C,NAME="addSmartStackShowFtn") RESULT(ptr)
-                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT,C_CHAR
                     IMPLICIT NONE
                     CHARACTER(KIND=C_CHAR),INTENT(IN) :: functionName
                 END FUNCTION c_createSmartStackShowTrace
 
                 SUBROUTINE c_deleteSmartStack(ptr) BIND(C,NAME="deleteSmartStackFtn")
-                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_PTR
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT
                     IMPLICIT NONE
-                    TYPE(C_PTR),VALUE,INTENT(IN) :: ptr
+                    INTEGER(C_INT),VALUE,INTENT(IN) :: ptr
                 END SUBROUTINE c_deleteSmartStack
 
                 SUBROUTINE c_startSession(session_name,processorId,proc0ToScreen) BIND(C,NAME="startSessionFtn")
-                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_INT,C_BOOL
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT,C_CHAR,C_BOOL
                     IMPLICIT NONE
                     CHARACTER(KIND=C_CHAR),INTENT(IN)     :: session_name
                     INTEGER(KIND=C_INT),VALUE,INTENT(IN)  :: processorId
@@ -62,7 +62,7 @@
                 END SUBROUTINE c_startSession
 
                 SUBROUTINE c_startSessionLog(session_name,processorId,proc0ToScreen,logFile) BIND(C,NAME="startSessionLogFtn")
-                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_INT,C_BOOL
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_CHAR,C_INT,C_BOOL
                     IMPLICIT NONE
                     CHARACTER(KIND=C_CHAR),INTENT(IN)     :: session_name
                     CHARACTER(KIND=C_CHAR),INTENT(IN)     :: logFile
@@ -94,19 +94,21 @@
                     CHARACTER(KIND=C_CHAR),INTENT(IN) :: message
                 END SUBROUTINE c_printCurrentFunctionMessage
 
-                SUBROUTINE c_printTimingReport(SORT_TYPE,SORT_ORDER) &
+                SUBROUTINE c_printTimingReport(TIME_UNITS,SORT_TYPE,SORT_ORDER) &
                         BIND(C,NAME="printTimingReportFtn")
                     USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT
                     IMPLICIT NONE
-                    INTEGER(KIND=C_INT),VALUE :: SORT_TYPE
-                    INTEGER(KIND=C_INT),VALUE :: SORT_ORDER
+                    INTEGER(KIND=C_INT),INTENT(IN),VALUE :: TIME_UNITS
+                    INTEGER(KIND=C_INT),INTENT(IN),VALUE :: SORT_TYPE
+                    INTEGER(KIND=C_INT),INTENT(IN),VALUE :: SORT_ORDER
                 END SUBROUTINE c_printTimingReport
 
-                SUBROUTINE c_saveTimingReport(FILENAME,SORT_TYPE,SORT_ORDER,OUTPUT_FORMAT) &
+                SUBROUTINE c_saveTimingReport(FILENAME,TIME_UNITS,SORT_TYPE,SORT_ORDER,OUTPUT_FORMAT) &
                         BIND(C,NAME="saveTimingReportFtn")
                     USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_CHAR,C_INT
                     IMPLICIT NONE
                     CHARACTER(KIND=C_CHAR),INTENT(IN)    :: FILENAME
+                    INTEGER(KIND=C_INT),INTENT(IN),VALUE :: TIME_UNITS
                     INTEGER(KIND=C_INT),INTENT(IN),VALUE :: SORT_TYPE
                     INTEGER(KIND=C_INT),INTENT(IN),VALUE :: SORT_ORDER
                     INTEGER(KIND=C_INT),INTENT(IN),VALUE :: OUTPUT_FORMAT
@@ -119,12 +121,6 @@
                 SUBROUTINE c_getCurrentFunction() BIND(C,NAME="getCurrentFunctionFtn")
                     IMPLICIT NONE
                 END SUBROUTINE c_getCurrentFunction
-
-                SUBROUTINE c_setReportUnits(unitType) BIND(C,NAME="setReportUnitsFtn")
-                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT
-                    IMPLICIT NONE
-                    INTEGER(KIND=C_INT),INTENT(IN),VALUE :: unitType
-                END SUBROUTINE c_setReportUnits
 
 
             END INTERFACE
@@ -147,15 +143,15 @@
                 END SUBROUTINE c2f_copyStringToFortran
 
                 SUBROUTINE init_t(this,function_name)
-                    USE,INTRINSIC    :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_NULL_CHAR
+                    USE,INTRINSIC    :: ISO_C_BINDING,ONLY:C_CHAR,C_NULL_CHAR
                     IMPLICIT NONE
                     CLASS(SMARTSTACK),INTENT(INOUT) :: this
                     CHARACTER(*),INTENT(IN)         :: function_name
                 END SUBROUTINE init_t
 
                 FUNCTION constructor(function_name,showStack) RESULT(this)
-                    USE,INTRINSIC                   :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_BOOL,&
-                                                                                C_NULL_CHAR
+                    USE,INTRINSIC                   :: ISO_C_BINDING,ONLY:C_CHAR,C_BOOL,&
+                                                                          C_NULL_CHAR
                     LOGICAL,INTENT(IN),OPTIONAL     :: showStack
                     TYPE(SMARTSTACK)                :: this
                     CHARACTER(*),INTENT(IN)         :: function_name
@@ -261,12 +257,19 @@
                     DEALLOCATE(c_string_buffer)
                 END SUBROUTINE SmartStack_getCurrentFunction
 
-                SUBROUTINE SmartStack_printTimingReport(SORT_TYPE,SORT_ORDER)
+                SUBROUTINE SmartStack_printTimingReport(UNIT_TYPE,SORT_TYPE,SORT_ORDER)
                     IMPLICIT NONE
+                    INTEGER,OPTIONAL,INTENT(IN) :: UNIT_TYPE
                     INTEGER,OPTIONAL,INTENT(IN) :: SORT_TYPE
                     INTEGER,OPTIONAL,INTENT(IN) :: SORT_ORDER
+                    INTEGER                     :: F_UNIT_TYPE
                     INTEGER                     :: F_SORT_TYPE
                     INTEGER                     :: F_SORT_ORDER
+                    IF(PRESENT(UNIT_TYPE))THEN
+                        F_UNIT_TYPE = UNIT_TYPE
+                    ELSE
+                        F_UNIT_TYPE = SMARTSTACK_MILLISECONDS
+                    ENDIF
                     IF(PRESENT(SORT_TYPE))THEN
                         F_SORT_TYPE = SORT_TYPE
                     ELSE
@@ -277,19 +280,26 @@
                     ELSE
                         F_SORT_ORDER = SMARTSTACK_SORTDECENDING
                     ENDIF
-                    CALL c_printTimingReport(F_SORT_TYPE,F_SORT_ORDER)
+                    CALL c_printTimingReport(F_UNIT_TYPE,F_SORT_TYPE,F_SORT_ORDER)
                 END SUBROUTINE SmartStack_printTimingReport
 
-                SUBROUTINE SmartStack_saveTimingReport(FILENAME,SORT_TYPE,SORT_ORDER,OUTPUT_FORMAT)
-                    USE,INTRINSIC    :: ISO_C_BINDING,ONLY:C_PTR,C_CHAR,C_NULL_CHAR
+                SUBROUTINE SmartStack_saveTimingReport(FILENAME,UNIT_TYPE,SORT_TYPE,SORT_ORDER,OUTPUT_FORMAT)
+                    USE,INTRINSIC    :: ISO_C_BINDING,ONLY:C_CHAR,C_NULL_CHAR
                     IMPLICIT NONE
                     CHARACTER(*),INTENT(IN)     :: FILENAME
+                    INTEGER,OPTIONAL,INTENT(IN) :: UNIT_TYPE
                     INTEGER,OPTIONAL,INTENT(IN) :: SORT_TYPE
                     INTEGER,OPTIONAL,INTENT(IN) :: SORT_ORDER
                     INTEGER,OPTIONAL,INTENT(IN) :: OUTPUT_FORMAT
+                    INTEGER                     :: F_UNIT_TYPE
                     INTEGER                     :: F_SORT_TYPE
                     INTEGER                     :: F_SORT_ORDER
                     INTEGER                     :: F_OUTPUT_FORMAT
+                    IF(PRESENT(UNIT_TYPE))THEN
+                        F_UNIT_TYPE = UNIT_TYPE
+                    ELSE
+                        F_UNIT_TYPE = SMARTSTACK_MILLISECONDS
+                    ENDIF
                     IF(PRESENT(SORT_TYPE))THEN
                         F_SORT_TYPE = SORT_TYPE
                     ELSE
@@ -305,13 +315,7 @@
                     ELSE
                         F_OUTPUT_FORMAT = SMARTSTACK_TABLE
                     ENDIF
-                    CALL c_saveTimingReport(FILENAME//C_NULL_CHAR,F_SORT_TYPE,F_SORT_ORDER,F_OUTPUT_FORMAT)
+                    CALL c_saveTimingReport(FILENAME//C_NULL_CHAR,F_UNIT_TYPE,F_SORT_TYPE,F_SORT_ORDER,F_OUTPUT_FORMAT)
                 END SUBROUTINE SmartStack_saveTimingReport
-
-                SUBROUTINE SmartStack_setReportUnits(unitType)
-                    IMPLICIT NONE
-                    INTEGER,INTENT(IN) :: unitType
-                    CALL c_setReportUnits(unitType)
-                END SUBROUTINE SmartStack_setReportUnits
 
         END MODULE SMARTSTACKMODULE

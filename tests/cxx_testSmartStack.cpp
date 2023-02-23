@@ -17,6 +17,7 @@
 // along with SmartStack.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------//
 #include <unistd.h>
+#include <iostream>
 
 #include "smartstack.h"
 
@@ -26,20 +27,28 @@ void doSomethingElse();
 int main(int argv, char** argc) {
   SmartStack::startSession("ADCIRC");
 
-  ADD_SMARTSTACK("main");
+  ADD_SMARTSTACK_LOGGING("main");
 
-  for (size_t i = 0; i < 1000; ++i) {
+  for (size_t i = 0; i < 3; ++i) {
     doSomething();
   }
 
   END_SMARTSTACK();
-  SmartStack::printTimingReport(SmartStack::Stack::TotalTime,SmartStack::Stack::Ascending);
+  SmartStack::printTimingReport(SmartStack::Report::Milliseconds,
+                                SmartStack::Report::TotalTime,
+                                SmartStack::Report::Ascending);
+
+  std::cout << "\n";
+
+  SmartStack::printTimingReport(SmartStack::Report::Microseconds,
+                                SmartStack::Report::TotalTime,
+                                SmartStack::Report::Ascending);
 
   return 0;
 }
 
 void doSomething() {
-  ADD_SMARTSTACK("doSomething")
+  ADD_SMARTSTACK_LOGGING("doSomething")
 
   usleep(500);
   doSomethingElse();
@@ -49,6 +58,6 @@ void doSomething() {
 }
 
 void doSomethingElse() {
-  ADD_SMARTSTACK("doSomethingElse");
+  ADD_SMARTSTACK_LOGGING("doSomethingElse");
   usleep(50);
 }

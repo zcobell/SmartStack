@@ -1,3 +1,4 @@
+#include "smartstackf.h"
 
         MODULE sample
             USE SMARTSTACKMODULE
@@ -7,11 +8,11 @@
 
             SUBROUTINE Smart1
                 IMPLICIT NONE
-                TYPE(SMARTSTACK),ALLOCATABLE :: ss
                 CHARACTER(200) :: fn
                 CHARACTER(10)  :: fn2
-                ss = SmartStack("Smart1",.TRUE.)
-                ss%initialize = .TRUE.
+
+                ADD_SMARTSTACK("Smart1", .FALSE.)
+
                 CALL SmartStack_getCurrentFunction(fn)
                 WRITE(*,'(2A)') "Manually getting current function name: ",TRIM(fn)
                 CALL SmartStack_getCurrentStack(fn2)
@@ -22,11 +23,11 @@
             
             SUBROUTINE Smart2
                 IMPLICIT NONE
-                TYPE(SMARTSTACK),ALLOCATABLE :: ss
                 CHARACTER(200) :: fn
                 CHARACTER(10)  :: fn2
-                ss = SmartStack("Smart2",.TRUE.)
-                ss%initialize = .TRUE.
+
+                ADD_SMARTSTACK("Smart2", .FALSE.)
+
                 CALL SmartStack_getCurrentStack(fn)
                 WRITE(*,'(2A)') "Manually getting current stack: ",TRIM(fn)
                 CALL SmartStack_getCurrentStack(fn2)
@@ -40,7 +41,7 @@
         PROGRAM smartstack_test
             USE sample
             IMPLICIT NONE
-            TYPE(SMARTSTACK),ALLOCATABLE :: ss
+            TYPE(SMARTSTACK) :: ss
 
             CALL SmartStack_StartSession("TestSession",245,.TRUE.,"proc256.log")
             ss = SmartStack("MAIN")
@@ -54,11 +55,9 @@
 
             CALL SmartStack_printTimingReport()
 
-            CALL SmartStack_setReportUnits(SMARTSTACK_MILLISECONDS)
-            CALL SmartStack_printTimingReport()
+            CALL SmartStack_printTimingReport(SMARTSTACK_MILLISECONDS)
 
-            CALL SmartStack_setReportUnits(SMARTSTACK_SECONDS)
-            CALL SmartStack_printTimingReport(SMARTSTACK_SORTCALLS,SMARTSTACK_SORTASCENDING)
+            CALL SmartStack_printTimingReport(SMARTSTACK_MILLISECONDS,SMARTSTACK_SORTCALLS,SMARTSTACK_SORTASCENDING)
 
             CALL SmartStack_saveTimingReport("report.txt",SmartStack_SortCalls,SmartStack_SortAscending)
 

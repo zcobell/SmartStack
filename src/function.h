@@ -16,35 +16,41 @@
 // You should have received a copy of the GNU General Public License
 // along with SmartStack.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------//
-#include "function.h"
+#ifndef FUNCTION_H
+#define FUNCTION_H
 
-#include <utility>
+#include <string>
 
-Function::Function(std::string name) : m_name(std::move(name)), m_ncall(0) {}
+#include "timer.h"
 
-void Function::startFunction() {
-  this->m_timer.startClock();
-  this->m_ncall++;
-}
+namespace SmartStack::detail {
 
-void Function::pauseFunction() { this->m_timer.pause(); }
+class Function {
+ public:
+  explicit Function(std::string name);
 
-void Function::restartFunction() { this->m_timer.restart(); }
+  void startFunction();
+  void endFunction();
 
-long long Function::meanDuration() {
-  return this->m_timer.elapsed() / this->m_ncall;
-}
+  void pauseFunction();
+  void restartFunction();
 
-long long Function::meanGlobalDuration() {
-  return this->m_timer.globalElapsed() / this->m_ncall;
-}
+  long long meanDuration();
+  long long meanGlobalDuration();
 
-void Function::endFunction() { this->m_timer.stopClock(); }
+  Timer *timer();
 
-std::string Function::name() const { return this->m_name; }
+  std::string name() const;
 
-long long Function::numCalls() const { return this->m_ncall; }
+  long long numCalls() const;
 
-Timer *Function::timer() { return &this->m_timer; }
+  bool running() const;
 
-bool Function::running() const { return this->m_timer.running(); }
+ private:
+  const std::string m_name;
+  long long m_ncall;
+  Timer m_timer;
+};
+}  // namespace SmartStack::detail
+
+#endif  // FUNCTION_H

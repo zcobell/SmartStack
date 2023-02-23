@@ -16,39 +16,26 @@
 // You should have received a copy of the GNU General Public License
 // along with SmartStack.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------//
-#ifndef FUNCTION_H
-#define FUNCTION_H
+#ifndef INSTRUMENTATION_H
+#define INSTRUMENTATION_H
 
 #include <string>
 
-#include "smartstack_global.h"
-#include "timer.h"
+#include "stack.h"
 
-class Function {
+namespace SmartStack {
+class Instrumentation {
  public:
-  SMARTSTACK_EXPORT explicit Function(std::string name);
-
-  void SMARTSTACK_EXPORT startFunction();
-  void SMARTSTACK_EXPORT endFunction();
-
-  void SMARTSTACK_EXPORT pauseFunction();
-  void SMARTSTACK_EXPORT restartFunction();
-
-  long long SMARTSTACK_EXPORT meanDuration();
-  long long SMARTSTACK_EXPORT meanGlobalDuration();
-
-  Timer SMARTSTACK_EXPORT *timer();
-
-  std::string SMARTSTACK_EXPORT name() const;
-
-  long long SMARTSTACK_EXPORT numCalls() const;
-
-  bool SMARTSTACK_EXPORT running() const;
+  explicit Instrumentation(const std::string &functionName,
+                           bool showStack = false)
+      : m_showStack(showStack) {
+    SmartStack::Stack::startFunction(functionName, this->m_showStack);
+  }
+  ~Instrumentation() { SmartStack::Stack::endFunction(this->m_showStack); }
 
  private:
-  const std::string m_name;
-  long long m_ncall;
-  Timer m_timer;
+  bool m_showStack;
 };
+}  // namespace SmartStack
 
-#endif  // FUNCTION_H
+#endif  // INSTRUMENTATION_H
