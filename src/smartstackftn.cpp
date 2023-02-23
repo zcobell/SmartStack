@@ -59,9 +59,11 @@ static SmartStack::Types::HashMap<
 static long long s_counter = 0;
 
 // List of possible units for the report output
-constexpr std::array<SmartStack::Report::SortType, 3> c_sortTypeList = {
+constexpr std::array<SmartStack::Report::SortType, 5> c_sortTypeList = {
     SmartStack::Report::SortType::Time, SmartStack::Report::SortType::MeanTime,
-    SmartStack::Report::SortType::Calls};
+    SmartStack::Report::SortType::Calls,
+    SmartStack::Report::SortType::TotalTime,
+    SmartStack::Report::SortType::MeanTotalTime};
 
 // List of possible sort orders for the report output
 constexpr std::array<SmartStack::Report::SortOrder, 2> c_sortOrderList = {
