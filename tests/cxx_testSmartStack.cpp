@@ -17,6 +17,7 @@
 // along with SmartStack.  If not, see <http://www.gnu.org/licenses/>.
 //------------------------------------------------------------------------//
 #include <unistd.h>
+
 #include <iostream>
 
 #include "smartstack.h"
@@ -33,7 +34,7 @@ int main(int argv, char** argc) {
     doSomething();
   }
 
-  END_SMARTSTACK();
+  SmartStack::endSession();
   SmartStack::printTimingReport(SmartStack::Report::Milliseconds,
                                 SmartStack::Report::TotalTime,
                                 SmartStack::Report::Ascending);

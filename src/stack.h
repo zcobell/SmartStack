@@ -26,9 +26,11 @@
 #include "function.h"
 #include "report.h"
 
+// Forward declaration of StackImpl
 namespace SmartStack::detail {
 class StackImpl;
 }
+
 
 namespace SmartStack::Stack {
 

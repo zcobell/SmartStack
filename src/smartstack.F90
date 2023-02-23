@@ -1,7 +1,6 @@
 
-
         MODULE SMARTSTACKMODULE
-            USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT
+            USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_LONG_LONG
             IMPLICIT NONE
 
             INTEGER,PARAMETER :: SMARTSTACK_SORTASCENDING = 10000
@@ -22,7 +21,7 @@
 
             TYPE SMARTSTACK
                 LOGICAL,PUBLIC      :: initialize = .TRUE.
-                INTEGER(C_INT),PRIVATE :: ptr
+                INTEGER(C_LONG_LONG),PRIVATE :: ptr
                 CONTAINS
                     FINAL                 :: destructor
                     PROCEDURE, PASS(THIS) :: init => init_t
@@ -33,24 +32,24 @@
             END INTERFACE SMARTSTACK
 
             INTERFACE
-                INTEGER(C_INT) FUNCTION c_createSmartStack(functionName) &
+                INTEGER(C_LONG_LONG) FUNCTION c_createSmartStack(functionName) &
                         BIND(C,NAME="addSmartStackFtn") RESULT(ptr)
-                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT,C_CHAR
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_LONG_LONG,C_CHAR
                     IMPLICIT NONE
                     CHARACTER(KIND=C_CHAR),INTENT(IN) :: functionName
                 END FUNCTION c_createSmartStack
 
-                INTEGER(C_INT) FUNCTION c_createSmartStackShowTrace(functionName) &
+                INTEGER(C_LONG_LONG) FUNCTION c_createSmartStackShowTrace(functionName) &
                         BIND(C,NAME="addSmartStackShowFtn") RESULT(ptr)
-                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT,C_CHAR
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_LONG_LONG,C_CHAR
                     IMPLICIT NONE
                     CHARACTER(KIND=C_CHAR),INTENT(IN) :: functionName
                 END FUNCTION c_createSmartStackShowTrace
 
                 SUBROUTINE c_deleteSmartStack(ptr) BIND(C,NAME="deleteSmartStackFtn")
-                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_INT
+                    USE,INTRINSIC :: ISO_C_BINDING,ONLY:C_LONG_LONG
                     IMPLICIT NONE
-                    INTEGER(C_INT),VALUE,INTENT(IN) :: ptr
+                    INTEGER(C_LONG_LONG),VALUE,INTENT(IN) :: ptr
                 END SUBROUTINE c_deleteSmartStack
 
                 SUBROUTINE c_startSession(session_name,processorId,proc0ToScreen) BIND(C,NAME="startSessionFtn")

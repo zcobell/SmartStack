@@ -11,19 +11,14 @@
 
 #include "function.h"
 #include "report.h"
-
-#ifdef SMARTSTACK_USE_FLAT_MAP
-#include "absl/container/flat_hash_map.h"
-using function_map_type =
-    absl::flat_hash_map<std::string, SmartStack::detail::Function *>;
-#else
-#include <unordered_map>
-using function_map_type =
-    std::unordered_map<std::string, SmartStack::detail::Function *>;
-#endif
+#include "smartstack_types.h"
 
 namespace SmartStack::detail {
 
+/* @brief Stack implementation
+ *
+ * This class implements the stack.
+ */
 class StackImpl {
  public:
   explicit StackImpl(size_t reserve = 0);
@@ -68,7 +63,8 @@ class StackImpl {
 
   std::vector<std::unique_ptr<Function>> m_functions;
   std::vector<Function *> m_functionStack;
-  function_map_type m_functionLookup;
+  SmartStack::Types::HashMap<std::string, SmartStack::detail::Function *>::type
+      m_functionLookup;
 };
 
 }  // namespace SmartStack::detail

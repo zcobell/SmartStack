@@ -32,9 +32,6 @@ class Timer {
   void restart();
   long long elapsed() const;
   long long globalElapsed() const;
-  long long startTime() const;
-  long long endTime() const;
-  long long lastElapsed() const;
   bool running() const;
 
  private:

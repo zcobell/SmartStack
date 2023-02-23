@@ -26,7 +26,7 @@
 #include "fmt/core.h"
 #include "smartstack.h"
 
-const size_t c_functionSize = 1500;
+const size_t c_functionSize = 500;
 std::chrono::high_resolution_clock::time_point t_init;
 std::vector<std::string> functionList(c_functionSize);
 std::vector<int> intList(c_functionSize);

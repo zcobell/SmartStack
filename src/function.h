@@ -26,6 +26,12 @@
 namespace SmartStack::detail {
 
 class Function {
+  /**
+   * @brief The Function class
+   *
+   * This class is used to track the timing of a function.  It is used
+   * internally by the SmartStack class.
+   */
  public:
   explicit Function(std::string name);
 
